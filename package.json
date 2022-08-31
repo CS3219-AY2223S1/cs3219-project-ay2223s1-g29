@@ -1,0 +1,17 @@
+{
+  "name": "cs3219-project-ay2223s1-g29",
+  "version": "1.0.0",
+  "private": true,
+  "repository": "git@github.com:CS3219-AY2223S1/cs3219-project-ay2223s1-g29.git",
+  "license": "MIT",
+  "workspaces": [
+    "*-service",
+    "frontend"
+  ],
+  "devDependencies": {
+    "eslint": "^8.23.0",
+    "husky": "^8.0.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.2"
+  }
+}
