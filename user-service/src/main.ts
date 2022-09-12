@@ -10,7 +10,6 @@ const main = async () => {
   app.listen(config.port, () => {
     logger.info(`Server is listening on port ${config.port}`);
   });
-
 };
 
 main();

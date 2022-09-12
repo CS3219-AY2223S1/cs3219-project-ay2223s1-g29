@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import UserService from '../../services/userService';
 import wrap from 'express-async-handler';
 import router from '..';
+import verifyToken from '../../middlewares/auth';
 
 const route = Router();
 
@@ -9,20 +10,20 @@ export default (app: Router) => {
   app.use('/users', route);
 
   route.post(
-    '/',
+    '/register',
     wrap(async (req: Request, res: Response) => {
-      const { name, dob, address, description } = req.body;
-      const newUser = await UserService.createUser(name, dob, address, description);
+      const { username, password } = req.body;
+      const newUser = await UserService.register(username, password);
       res.json(newUser).status(200);
     }),
   );
 
-  route.get(
-    '/:userId',
+  route.post(
+    '/login',
     wrap(async (req: Request, res: Response) => {
-      const { userId } = req.params;
-      const users = await UserService.getUser(userId);
-      res.json(users).status(200);
+      const { username, password } = req.body;
+      const user = await UserService.login(username, password);
+      res.json(user).status(200);
     }),
   );
 
@@ -37,10 +38,12 @@ export default (app: Router) => {
   );
 
   route.delete(
-    '/:userId',
+    '/',
+    verifyToken,
     wrap(async (req: Request, res: Response) => {
-      const { userId } = req.params;
-      const deletedUser = await UserService.deleteUser(userId);
+      const { username } = req.params;
+      console.log(req.params);
+      const deletedUser = await UserService.deleteUser(username);
       res.json(deletedUser).status(200);
     }),
   );

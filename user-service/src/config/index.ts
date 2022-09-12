@@ -12,9 +12,9 @@ export default {
   // Application port.
   port: parseInt(process.env.PORT) || 3000,
 
-
   // DB connection options.
   database: {
     url: process.env.DB_URL,
+    name: 'user-service',
   },
 };

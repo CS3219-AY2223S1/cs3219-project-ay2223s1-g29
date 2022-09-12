@@ -1,52 +1,76 @@
 import { logger } from '../loggers/logger';
 import { UserUpdateOptions } from '../models/user';
 import UserRepo from '../repository/userRepo';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-const createUser = async (name: string, dob: string, address: string, description: string) => {
-  logger.info(`Creating user with name: ${name}`);
-  const newUser = await UserRepo.createUser({
-    name,
-    dob,
-    address,
-    description,
-    createdAt: new Date(),
+const ROUNDS = 10;
+
+const generateJWT = (username: string) => {
+  const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+    expiresIn: '6h',
   });
-  if (!newUser) {
-    throw new Error(`Failed to create user with name: ${name}`);
-  }
-  return newUser;
+  return token;
 };
 
-const updateUser = async (userId: string, updatedUserFields: UserUpdateOptions) => {
-  logger.info(`Updating user with id: ${userId}`);
-  const updatedUser = await UserRepo.updateUser(userId, updatedUserFields);
+const register = async (username: string, password: string) => {
+  logger.info(`Creating user with username: ${username}`);
+  let hashedPassword = await bcrypt.hash(password, ROUNDS);
+  const newUser = await UserRepo.register({
+    username,
+    password: hashedPassword,
+  });
+  if (!newUser) {
+    throw new Error(`Failed to create user with username: ${username}`);
+  }
+  return {
+    token: generateJWT(username),
+    id: newUser._id,
+    username: newUser.username,
+  };
+};
+
+const updateUser = async (username: string, updatedUserFields: UserUpdateOptions) => {
+  logger.info(`Updating user with id: ${username}`);
+  const updatedUser = await UserRepo.updateUser(username, updatedUserFields);
   if (!updatedUser) {
-    throw new Error(`Failed to update user with id: ${userId}`);
+    throw new Error(`Failed to update user with id: ${username}`);
   }
   return updatedUser;
 };
 
-const getUser = async (userId: string) => {
-  logger.info(`Getting user with id: ${userId}`);
-  const user = await UserRepo.getUser(userId);
+const login = async (username: string, password: string) => {
+  logger.info(`Logging in username: ${username}`);
+  const user = await UserRepo.getUser(username);
   if (!user) {
-    throw new Error(`Failed to get user with id: ${userId}`);
+    throw new Error(`Failed to get user with id: ${username}`);
   }
-  return user;
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  if (!isPasswordCorrect) {
+    throw new Error(`Incorrect password for username: ${username}`);
+  }
+  return {
+    token: generateJWT(username),
+    id: user._id,
+    username: user.username,
+  };
 };
 
-const deleteUser = async (userId: string) => {
-  logger.info(`Deleting user with id: ${userId}`);
-  const deletedUser = await UserRepo.deleteUser(userId);
+const deleteUser = async (username: string) => {
+  logger.info(`Deleting ${username}'s account`);
+  const deletedUser = await UserRepo.deleteUser(username);
   if (!deletedUser) {
-    throw new Error(`Failed to delete user with id: ${userId}`);
+    throw new Error(`Failed to delete ${username}'s account`);
+  }
+  if (deletedUser.deletedCount === 0) {
+    throw new Error(`${username}'s account does not exist!`);
   }
   return deletedUser;
 };
 
 const UserService = {
-  createUser,
-  getUser,
+  register,
+  login,
   updateUser,
   deleteUser,
 };

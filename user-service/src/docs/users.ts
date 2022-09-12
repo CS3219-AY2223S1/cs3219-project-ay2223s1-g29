@@ -1,30 +1,9 @@
 const tags = ['Users'];
 
-const get = () => {
+const login = () => {
   return {
-    summary: 'Gets a user by id',
-    description: 'Gets a user by id',
-    tags,
-    parameters: [
-      {
-        in: 'path',
-        name: 'userId',
-        type: 'string',
-        required: true,
-      },
-    ],
-    responses: {
-      200: {
-        description: 'Returns the user',
-      },
-    },
-  };
-};
-
-const post = () => {
-  return {
-    summary: 'Creates a new user',
-    description: 'Creates a new user',
+    summary: 'Login with username and password',
+    description: 'Login with username and password',
     tags,
     requestBody: {
       required: true,
@@ -33,21 +12,46 @@ const post = () => {
           schema: {
             type: 'object',
             properties: {
-              name: {
+              username: {
                 type: 'string',
-                example: 'Leanne Graham',
+                example: 'John',
               },
-              dob: {
+              password: {
                 type: 'string',
-                example: '11/11/1991',
+                example: 'password1234',
               },
-              address: {
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Returns the user',
+      },
+    },
+  };
+};
+
+const register = () => {
+  return {
+    summary: 'Registers a new user',
+    description: 'Registers a new user',
+    tags,
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              username: {
                 type: 'string',
-                example: '711-721 Debs Place',
+                example: 'John',
               },
-              description: {
+              password: {
                 type: 'string',
-                example: 'I am a user',
+                example: 'password1234',
               },
             },
           },
@@ -113,15 +117,12 @@ const patch = () => {
 
 const del = () => {
   return {
-    summary: 'Deletes a user by id',
-    description: 'Deletes a user by id',
+    summary: 'Deletes a user by username',
+    description: 'Deletes a user by username',
     tags,
-    parameters: [
+    security: [
       {
-        in: 'path',
-        name: 'userId',
-        type: 'string',
-        required: true,
+        bearerAuth: [],
       },
     ],
     responses: {
@@ -133,8 +134,8 @@ const del = () => {
 };
 
 const Users = {
-  get,
-  post,
+  register,
+  login,
   patch,
   del,
 };

@@ -27,4 +27,3 @@ export const httpLogger = morgan((tokens, req, res) =>
     chalk.gray(tokens['user-agent'](req, res)),
   ].join(' '),
 );
-

@@ -8,13 +8,24 @@ export default () => {
     info: info(),
     servers: servers(),
     paths: {
-      '/users': {
-        post: users.post(),
+      '/users/register': {
+        post: users.register(),
       },
-      '/users/{userId}': {
-        get: users.get(),
+      '/users/login': {
+        post: users.login(),
+      },
+      '/users': {
         patch: users.patch(),
         delete: users.del(),
+      },
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
       },
     },
   };
