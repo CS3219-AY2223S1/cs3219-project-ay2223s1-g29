@@ -1,15 +1,15 @@
 import { User, UserModel, UserUpdateOptions } from '../models/user';
 
-const register = async (user: User) => {
+const createUser = async (user: User) => {
   const newUser = await UserModel.create(user);
   return newUser;
 };
 
-const updateUser = async (userId: string, updatedUserFields: UserUpdateOptions) => {
-  const updatedUser = await UserModel.findByIdAndUpdate(userId, updatedUserFields, {
+const updateUser = async (username: string, updatedUserFields: UserUpdateOptions) => {
+  const updatedUser = await UserModel.findOneAndUpdate({ username }, updatedUserFields, {
     new: true,
   })
-    .select('-__v')
+    .select('-__v -password')
     .lean();
   return updatedUser;
 };
@@ -25,7 +25,7 @@ const deleteUser = async (username: string) => {
 };
 
 const UserRepo = {
-  register,
+  createUser,
   updateUser,
   getUser,
   deleteUser,

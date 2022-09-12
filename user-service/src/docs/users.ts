@@ -68,15 +68,12 @@ const register = () => {
 
 const patch = () => {
   return {
-    summary: 'Updates a user by id',
-    description: 'Updates a user by id',
+    summary: 'Updates a user',
+    description: 'Updates a user',
     tags,
-    parameters: [
+    security: [
       {
-        in: 'path',
-        name: 'userId',
-        type: 'string',
-        required: true,
+        bearerAuth: [],
       },
     ],
     requestBody: {
@@ -86,21 +83,9 @@ const patch = () => {
           schema: {
             type: 'object',
             properties: {
-              name: {
+              password: {
                 type: 'string',
-                example: 'Leanne Graham',
-              },
-              dob: {
-                type: 'string',
-                example: '11/11/1991',
-              },
-              address: {
-                type: 'string',
-                example: '711-721 Debs Place',
-              },
-              description: {
-                type: 'string',
-                example: 'I am a user',
+                example: 'password1234',
               },
             },
           },

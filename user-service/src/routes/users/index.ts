@@ -28,11 +28,12 @@ export default (app: Router) => {
   );
 
   route.patch(
-    '/:userId',
+    '/',
+    verifyToken,
     wrap(async (req: Request, res: Response) => {
-      const { userId } = req.params;
+      const { username } = req.params;
       const updatedUserFields = req.body;
-      const updatedUser = await UserService.updateUser(userId, updatedUserFields);
+      const updatedUser = await UserService.updateUser(username, updatedUserFields);
       res.json(updatedUser).status(200);
     }),
   );
@@ -42,7 +43,6 @@ export default (app: Router) => {
     verifyToken,
     wrap(async (req: Request, res: Response) => {
       const { username } = req.params;
-      console.log(req.params);
       const deletedUser = await UserService.deleteUser(username);
       res.json(deletedUser).status(200);
     }),

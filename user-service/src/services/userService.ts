@@ -16,7 +16,7 @@ const generateJWT = (username: string) => {
 const register = async (username: string, password: string) => {
   logger.info(`Creating user with username: ${username}`);
   let hashedPassword = await bcrypt.hash(password, ROUNDS);
-  const newUser = await UserRepo.register({
+  const newUser = await UserRepo.createUser({
     username,
     password: hashedPassword,
   });
@@ -32,6 +32,9 @@ const register = async (username: string, password: string) => {
 
 const updateUser = async (username: string, updatedUserFields: UserUpdateOptions) => {
   logger.info(`Updating user with id: ${username}`);
+  if (updatedUserFields.password) {
+    updatedUserFields.password = await bcrypt.hash(updatedUserFields.password, ROUNDS);
+  }
   const updatedUser = await UserRepo.updateUser(username, updatedUserFields);
   if (!updatedUser) {
     throw new Error(`Failed to update user with id: ${username}`);
