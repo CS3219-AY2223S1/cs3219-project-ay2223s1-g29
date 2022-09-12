@@ -8,6 +8,10 @@
     "*-service",
     "frontend"
   ],
+  "scripts": {
+    "dev:user-service": "npm run dev --prefix user-service",
+    "format": "prettier --write \"**/*.ts\""
+  },
   "devDependencies": {
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
