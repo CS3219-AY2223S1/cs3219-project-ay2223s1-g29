@@ -1,44 +1,32 @@
-import axios, { AxiosRequestHeaders } from 'axios'
+import axios, { AxiosRequestHeaders } from 'axios';
 
-export const httpGet = async (
-  url: string,
-  headers: AxiosRequestHeaders,
-  params?: any
-) =>
+export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
   axios({
     method: 'get',
     url,
     headers,
-    params
-  })
+    params,
+  });
 
-export const httpPost = async (
-  url: string,
-  headers: AxiosRequestHeaders,
-  data: any
-) =>
+export const httpPost = async (url: string, headers: AxiosRequestHeaders, data: any) =>
   axios({
     method: 'post',
     url,
     headers,
-    data
-  })
+    data,
+  });
 
-export const httpPut = async (
-  url: string,
-  headers: AxiosRequestHeaders,
-  data: any
-) =>
+export const httpPut = async (url: string, headers: AxiosRequestHeaders, data: any) =>
   axios({
     method: 'put',
     url,
     headers,
-    data
-  })
+    data,
+  });
 
 export const httpDelete = async (url: string, headers: AxiosRequestHeaders) =>
   axios({
     method: 'delete',
     url,
-    headers
-  })
+    headers,
+  });
