@@ -1,7 +1,7 @@
-import UnauthenticatedApp from './apps/UnauthenticatedApp'
+import UnauthenticatedApp from './apps/UnauthenticatedApp';
 
 function App() {
-  return <UnauthenticatedApp />
+  return <UnauthenticatedApp />;
 }
 
-export default App
+export default App;
