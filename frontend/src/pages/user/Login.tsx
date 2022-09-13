@@ -14,7 +14,7 @@ export default function Login() {
         </Heading>
         <Text fontSize="lg">Let&apos;s get you signed in</Text>
 
-        <Link color="teal.500" href="#" as={ReactRouterLink} to="/register">
+        <Link color="teal.500" as={ReactRouterLink} to="/register">
           New here? Create an account.
         </Link>
       </Flex>

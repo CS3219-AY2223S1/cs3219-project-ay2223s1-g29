@@ -9,6 +9,7 @@ export type IOptionalAuthContext = {
     },
     token: string,
   ) => void;
+  clearAuth: () => void;
 };
 
 export type IAuthContext = {
@@ -22,4 +23,5 @@ export type IAuthContext = {
     },
     token: string,
   ) => void;
+  clearAuth: () => void;
 };

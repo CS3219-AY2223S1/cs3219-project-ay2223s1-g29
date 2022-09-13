@@ -1,6 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
+import {
+  FormErrorMessage,
+  FormLabel,
+  FormControl,
+  Input,
+  Button,
+  Flex,
+  FormHelperText,
+  Box,
+} from '@chakra-ui/react';
 import UserApi from '../../apis/UserApi';
 import { useOptionalAuth } from '../../context/AuthContext';
 
@@ -21,16 +30,17 @@ export default function RegisterForm() {
   const { setAuth } = useOptionalAuth();
   const [registerErr, setRegisterErr] = useState<string>('');
 
-  function onSubmit(values: RegisterFormValues) {
+  const onSubmit = useCallback((values: RegisterFormValues) => {
     UserApi.register(values)
       .then((res) => {
         const {
           data: { id, token, username },
         } = res;
         setAuth({ id, username }, token);
+        window.location.reload();
       })
       .catch((err) => setRegisterErr(err.message));
-  }
+  }, []);
 
   const validateCfmPassword = useCallback(
     (cfmPassword: string) => {
@@ -48,6 +58,7 @@ export default function RegisterForm() {
           <Input
             id="username"
             placeholder="Enter username"
+            autoFocus
             {...register('username', {
               required: 'Username is required',
             })}
@@ -85,7 +96,7 @@ export default function RegisterForm() {
             })}
           />
           <FormErrorMessage>
-            <span>{errors.cfmPassword && errors.cfmPassword.message?.toString()}</span>
+            {errors.cfmPassword && errors.cfmPassword.message?.toString()}
           </FormErrorMessage>
         </FormControl>
 
@@ -93,6 +104,7 @@ export default function RegisterForm() {
           Create Account
         </Button>
       </Flex>
+      <div style={{ minHeight: '2em' }}>{registerErr}</div>
     </form>
   );
 }

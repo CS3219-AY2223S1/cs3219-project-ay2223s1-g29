@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
 import UserApi from '../../apis/UserApi';
@@ -19,16 +19,17 @@ export default function LoginForm() {
   const { setAuth } = useOptionalAuth();
   const [loginErr, setLoginErr] = useState<string>('');
 
-  function onSubmit(values: { username: string; password: string }) {
+  const onSubmit = useCallback((values: { username: string; password: string }) => {
     UserApi.login(values)
       .then((res) => {
         const {
           data: { id, token, username },
         } = res;
         setAuth({ id, username }, token);
+        window.location.reload();
       })
       .catch((err) => setLoginErr(err.message));
-  }
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -38,6 +39,7 @@ export default function LoginForm() {
           <Input
             id="username"
             placeholder="Enter username"
+            autoFocus
             {...register('username', {
               required: 'Username is required',
             })}
@@ -67,6 +69,7 @@ export default function LoginForm() {
           Sign In
         </Button>
       </Flex>
+      <div style={{ minHeight: '2em' }}>{loginErr}</div>
     </form>
   );
 }

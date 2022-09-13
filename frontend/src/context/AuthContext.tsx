@@ -12,7 +12,7 @@ import { IOptionalAuthContext, IAuthContext } from '../types/context/AuthContext
 const AuthContext = createContext<IOptionalAuthContext | null>(null);
 
 const AuthContextProvider = (props: { children: ReactNode }) => {
-  const [cookie, setCookie] = useCookies(['cs3219-prpr-t']);
+  const [cookie, setCookie, removeCookie] = useCookies(['cs3219-prpr-t']);
 
   const [username, setUsername] = useState<string | undefined>();
   const [userId, setUserId] = useState<string | undefined>();
@@ -58,7 +58,14 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
     [],
   );
 
-  return <AuthContext.Provider value={{ username, token, userId, setAuth }} {...props} />;
+  const clearAuth = useCallback(() => {
+    localStorage.clear();
+    removeCookie('cs3219-prpr-t');
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ username, token, userId, setAuth, clearAuth }} {...props} />
+  );
 };
 
 export default AuthContextProvider;
