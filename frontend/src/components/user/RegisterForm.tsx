@@ -1,6 +1,14 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
+import UserApi from '../../apis/UserApi';
+import { useOptionalAuth } from '../../context/AuthContext';
+
+type RegisterFormValues = {
+  username: string;
+  password: string;
+  cfmPassword: string;
+};
 
 export default function RegisterForm() {
   const {
@@ -8,15 +16,20 @@ export default function RegisterForm() {
     register,
     formState: { errors, isSubmitting },
     getValues,
-  } = useForm();
+  } = useForm<RegisterFormValues>();
 
-  function onSubmit(values: any) {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve();
-      }, 3000);
-    });
+  const { setAuth } = useOptionalAuth();
+  const [registerErr, setRegisterErr] = useState<string>('');
+
+  function onSubmit(values: RegisterFormValues) {
+    UserApi.register(values)
+      .then((res) => {
+        const {
+          data: { id, token, username },
+        } = res;
+        setAuth({ id, username }, token);
+      })
+      .catch((err) => setRegisterErr(err.message));
   }
 
   const validateCfmPassword = useCallback(

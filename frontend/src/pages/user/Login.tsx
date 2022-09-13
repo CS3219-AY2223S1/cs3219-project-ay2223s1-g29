@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flex, Heading, Text } from '@chakra-ui/react';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { Flex, Heading, Link, Text } from '@chakra-ui/react';
 import LoginForm from '../../components/user/LoginForm';
 import { MdWavingHand } from 'react-icons/md';
 
@@ -11,7 +12,11 @@ export default function Login() {
           Hello
           <MdWavingHand />
         </Heading>
-        <Text fontSize="lg">Let's get you signed in</Text>
+        <Text fontSize="lg">Let&apos;s get you signed in</Text>
+
+        <Link color="teal.500" href="#" as={ReactRouterLink} to="/register">
+          New here? Create an account.
+        </Link>
       </Flex>
       <LoginForm />
     </Flex>

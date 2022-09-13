@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
+import UserApi from '../../apis/UserApi';
+import { useOptionalAuth } from '../../context/AuthContext';
+
+type LoginFormValues = {
+  username: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm<LoginFormValues>();
 
-  function onSubmit(values: any) {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve();
-      }, 3000);
-    });
+  const { setAuth } = useOptionalAuth();
+  const [loginErr, setLoginErr] = useState<string>('');
+
+  function onSubmit(values: { username: string; password: string }) {
+    UserApi.login(values)
+      .then((res) => {
+        const {
+          data: { id, token, username },
+        } = res;
+        setAuth({ id, username }, token);
+      })
+      .catch((err) => setLoginErr(err.message));
   }
 
   return (
