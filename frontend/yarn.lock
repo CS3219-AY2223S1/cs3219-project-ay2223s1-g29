@@ -1331,6 +1331,11 @@ caniuse-lite@^1.0.30001370:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001399.tgz#1bf994ca375d7f33f8d01ce03b7d5139e8587873"
   integrity sha512-4vQ90tMKS+FkvuVWS5/QY1+d805ODxZiKFzsU8o/RsVJz49ZSRR8EjykLJbqhzdPgadbX6wB538wOzle3JniRA==
 
+chakra-ui-steps@^1.7.4:
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/chakra-ui-steps/-/chakra-ui-steps-1.7.4.tgz#9174c87b66f530f83ad7ab2568e5dd450b1e5576"
+  integrity sha512-EAHW04azBL0Vz0vR9uMJ92qTKeOc86gbHGXoeRd8wAKcTyQOf7vK5eyS4BUWq8Bflb2ZXVAdLhJtVumNerEuzg==
+
 chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -1621,10 +1626,10 @@ formik@^2.2.9:
     tiny-warning "^1.0.2"
     tslib "^1.10.0"
 
-framer-motion@^7.3.2:
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-7.3.2.tgz#9768092cd98cf0ebaf70864f1248f2e703305a15"
-  integrity sha512-BTG0BqJSwxoFBWpwaaxS/954DGZFsluF+dUv9Hfq53VNkwUt5g+wYTEM66oTUhiH/+6R/y0Rq+BmkUBcmzbyMQ==
+framer-motion@^7.3.4:
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-7.3.4.tgz#d3d4188102d1c8b8f24c55b698853d34de2ff18e"
+  integrity sha512-TE0qQtrJ0laUb6Gzt+RBbHy7MmS5TrUshhjwWTpZP/MIBQ8HWrgJ6GpNCu6GOYayNVcgbvAWO33tRVEAcw/52w==
   dependencies:
     "@motionone/dom" "10.13.1"
     framesync "6.1.2"

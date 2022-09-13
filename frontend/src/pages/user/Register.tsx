@@ -1,4 +1,4 @@
-import { Flex, Heading, Text, Link } from '@chakra-ui/react';
+import { Flex, Heading, Text, Link, Center } from '@chakra-ui/react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import React from 'react';
 import { MdWavingHand } from 'react-icons/md';
@@ -6,7 +6,7 @@ import RegisterForm from '../../components/user/RegisterForm';
 
 export default function Register() {
   return (
-    <Flex justify="center" align="center" w="100vw" h="100vh" direction="column" rowGap={4}>
+    <Center flexDirection="column" h="100vh" rowGap={4}>
       <Flex justify="center" align="center" direction="column">
         <Heading display="flex" columnGap={2}>
           Welcome
@@ -18,6 +18,6 @@ export default function Register() {
         </Link>
       </Flex>
       <RegisterForm />
-    </Flex>
+    </Center>
   );
 }

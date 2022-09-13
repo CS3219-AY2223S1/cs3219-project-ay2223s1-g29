@@ -1,57 +1,66 @@
-import { ButtonGroup, Button, Box, Flex } from '@chakra-ui/react';
+import { ButtonGroup, Button, Box, Flex, SimpleGrid } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 type DifficultyButtonsProps = {
-  text: string;
-  onClick: () => void;
-  color: 'purple.600' | 'blue.300' | 'pink.300' | 'yellow.300';
+  onClick: (type: DIFFICULTY) => void;
 };
 
-enum DIFFICULTY {
-  EASY = 'e',
-  MEDIUM = 'm',
-  HARD = 'h',
-  RANDOM = 'r',
+export const enum DIFFICULTY {
+  EASY = 'Easy',
+  MEDIUM = 'Medium',
+  HARD = 'Hard',
+  RANDOM = 'Random',
 }
 
 export default function DifficultyButtons(props: DifficultyButtonsProps) {
-  const navigate = useNavigate();
-  const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
+  const { onClick } = props;
 
   const onClickHandler = useCallback(
     (type: DIFFICULTY) => () => {
-      setDifficulty(type);
+      onClick(type);
     },
     [],
   );
 
-  useEffect(() => {
-    if (!difficulty) {
-      return;
-    }
-    console.log('sending matching request for ', difficulty);
-  }, [difficulty]);
-
   return (
-    <>
-      <Flex columnGap={2}>
-        <Button type="button" color="purple.600" onClick={onClickHandler(DIFFICULTY.EASY)}>
-          Easy
-        </Button>
-        <Button type="button" color="blue.300" onClick={onClickHandler(DIFFICULTY.MEDIUM)}>
-          Medium
-        </Button>
-      </Flex>
-
-      <Flex mt={2} columnGap={2}>
-        <Button type="button" color="pink.300" onClick={onClickHandler(DIFFICULTY.HARD)}>
-          Hard
-        </Button>
-        <Button type="button" color="yellow.300" onClick={onClickHandler(DIFFICULTY.RANDOM)}>
-          Random
-        </Button>
-      </Flex>
-    </>
+    <SimpleGrid columns={2} spacing={2}>
+      <Button
+        type="button"
+        color="green.300"
+        onClick={onClickHandler(DIFFICULTY.EASY)}
+        flex={1}
+        size="lg"
+      >
+        Easy
+      </Button>
+      <Button
+        type="button"
+        color="yellow.300"
+        onClick={onClickHandler(DIFFICULTY.MEDIUM)}
+        flex={1}
+        size="lg"
+      >
+        Medium
+      </Button>
+      <Button
+        type="button"
+        color="pink.300"
+        onClick={onClickHandler(DIFFICULTY.HARD)}
+        flex={1}
+        size="lg"
+      >
+        Hard
+      </Button>
+      <Button
+        type="button"
+        color="purple.300"
+        onClick={onClickHandler(DIFFICULTY.RANDOM)}
+        flex={1}
+        size="lg"
+      >
+        Random
+      </Button>
+    </SimpleGrid>
   );
 }
