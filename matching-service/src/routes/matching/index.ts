@@ -11,17 +11,17 @@ export default(app: Router) => {
     route.post(
         '/',
         wrap(async (req:Request, res:Response) => {
-            const {name, difficulty} = req.body;
-            console.log(name, difficulty);
-            if (name && difficulty) {
+            const {userid, difficulty} = req.body;
+            console.log(userid, difficulty);
+            if (userid && difficulty) {
                 // check if queue is empty
                 if (MatchingService.isEmpty(difficulty)) {
                     // if it is empty, add to queue
                     console.log("queue is empty, adding to queue");
-                    MatchingService.addQueue(name, difficulty);
+                    MatchingService.addQueue(userid, difficulty);
                 } else {
                     console.log("queue is not empty, there is a match");
-                    // TODO: notify collab service that there is a match
+                    // TODO: notify collab service that there is a match by calling collab service api
                     MatchingService.popQueue(difficulty);
                 }
                 res.json({'status': 'matching user'}).status(200);
@@ -30,12 +30,4 @@ export default(app: Router) => {
             }
         }),
     );
-
-    // TODO: for collab service to keep polling to check if there is a match
-    route.get(
-        '/',
-        wrap(async(req:Request, res:Response) => {
-            res.json({'status': 'working'}).status(200);
-        })
-    )
 };
