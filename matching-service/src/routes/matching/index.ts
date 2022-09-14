@@ -1,6 +1,6 @@
 import { Request, Response, Router} from 'express';
 import wrap from 'express-async-handler';
-import MatchingService from '../../service/matchingService';
+import MatchingService from '../../services/matchingService';
 
 const route = Router();
 
