@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gcp-build": "tsc && vite build",
+    "gcp-deploy": "gcloud app deploy"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.3.2",
@@ -23,6 +25,9 @@
     "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "yup": "^0.32.11"
+  },
+  "engines": {
+    "node": "16.x.x"
   },
   "devDependencies": {
     "@types/node": "^18.7.17",
