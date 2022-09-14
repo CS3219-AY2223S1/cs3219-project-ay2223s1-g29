@@ -1,17 +1,18 @@
-import React from 'react'
-import { BrowserRouter, Route } from 'react-router-dom'
-import AccountPage from '../pages/account/AccountPage'
-import HomePage from '../pages/home/HomePage'
-import RoomPage from '../pages/room/[:roomId]/RoomPage'
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+const Home = lazy(() => import('../pages/home/Home'));
 
 export default function AuthenticatedApp() {
   return (
-    <BrowserRouter>
-      <Route path='/home' element={<HomePage />} />
-      <Route path='/room/:roomId' element={<RoomPage />} />
-      <Route path='/account' element={<AccountPage />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
 
-      <Route path='*' element={<HomePage />} />
-    </BrowserRouter>
-  )
+          <Route path="*" element={<Navigate to="" />} />
+        </Routes>
+      </BrowserRouter>
+    </Suspense>
+  );
 }

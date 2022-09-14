@@ -1,1 +1,1 @@
-export default class CollabApi {}
+export default class CollabApi { }
