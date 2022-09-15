@@ -1,4 +1,16 @@
+import { ApiServiceInterface } from './../interface';
 import axios, { AxiosRequestHeaders } from 'axios';
+import { RegisterPostData, RegisterResponse, LoginPostData } from '../../types/api/user.type';
+import UserApi from './user';
+
+export class ApiService implements ApiServiceInterface {
+  user = {
+    register: UserApi.register,
+    login: UserApi.login
+  };
+
+  collab = {};
+}
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
   axios({
@@ -30,3 +42,5 @@ export const httpDelete = async (url: string, headers: AxiosRequestHeaders) =>
     url,
     headers,
   });
+
+
