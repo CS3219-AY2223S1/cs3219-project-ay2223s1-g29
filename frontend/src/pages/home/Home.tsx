@@ -1,24 +1,40 @@
-import { Box, Center, Flex, Text } from '@chakra-ui/react';
+import { Box, Center, Flex, Grid, GridItem, Text } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import DifficultyButtons, { DIFFICULTY } from '../../components/question/DifficultyButtons';
+import DifficultyButtons from '../../components/question/DifficultyButtons';
 import UserHomeCard from '../../components/user/UserHomeCard';
 import { useAuth } from '../../context/AuthContext';
 import { Step, Steps, useSteps } from 'chakra-ui-steps';
 import MatchingIndicator from '../../components/matching/MatchingIndicator';
+import { DIFFICULTY } from '../../components/question/utils';
+import useIsMobile from '../../hooks/useIsMobile';
 
-const STEPS = [{ label: 'Select difficulty' }, { label: 'Wait for a match' }, { label: 'Start' }];
+const STEPS = [
+  { label: 'Select difficulty' },
+  { label: 'Wait for a match' },
+  { label: "Let's start!" },
+];
 
 export default function Home() {
   const { username, token } = useAuth();
+  const isMobile = useIsMobile();
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
+  const [msg, setMsg] = useState<string>('');
 
-  const { nextStep, activeStep, reset } = useSteps({
+  const {
+    nextStep,
+    activeStep,
+    reset: resetStep,
+  } = useSteps({
     initialStep: 0,
   });
 
-  console.log({ activeStep });
+  const reset = useCallback(() => {
+    resetStep();
+    setMsg('');
+  }, [resetStep]);
+
   const onClickHandler = useCallback(
     (difficulty: DIFFICULTY) => {
       nextStep();
@@ -26,13 +42,15 @@ export default function Home() {
 
       // send api call to match
       // if ok, begin countdown
-      setTimeLeft(30);
+      setTimeLeft(60);
     },
     [activeStep],
   );
 
   useEffect(() => {
     if (timeLeft <= 0) {
+      reset();
+      setMsg('Could not find you a match.\nPlease try again later!');
       return;
     }
 
@@ -53,20 +71,39 @@ export default function Home() {
         <Text fontSize="3xl">Start your interview preparation</Text>
       </Center>
 
-      <Flex justify="space-between" align="center" mb={4} columnGap={4}>
-        <Steps activeStep={activeStep} mt={4} orientation="vertical">
-          {STEPS.map(({ label }) => (
-            <Step label={label} key={label} />
-          ))}
-        </Steps>
+      <Center minWidth="50%" px="10%">
+        {!isMobile && (
+          <>
+            <Steps activeStep={activeStep} mt={4} orientation="vertical" flexBasis="34%">
+              {STEPS.map(({ label }) => (
+                <Step label={label} key={label} />
+              ))}
+            </Steps>
 
-        <Box>
-          {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} />}
-          {activeStep === 1 && difficulty && (
-            <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
-          )}
-        </Box>
-      </Flex>
+            <Box alignSelf="center" width="250px">
+              {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
+              {activeStep === 1 && difficulty && (
+                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+              )}
+            </Box>
+          </>
+        )}
+
+        {isMobile && (
+          <Flex direction="column" align="center" justify="center">
+            <Text fontSize="1xl" mb={2}>
+              {STEPS[activeStep].label}
+            </Text>
+
+            <Box alignSelf="center" width="250px">
+              {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
+              {activeStep === 1 && difficulty && (
+                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+              )}
+            </Box>
+          </Flex>
+        )}
+      </Center>
     </Center>
   );
 }
