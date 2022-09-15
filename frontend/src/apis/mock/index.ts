@@ -1,5 +1,7 @@
-import { ApiServiceInterface } from "../interface";
+import { ApiResponse, ApiServiceInterface } from "../interface";
+import { MatchPostData } from "../types/matching.type";
 import user from './user'
+import matching from './matching'
 
 export class MockApiService implements ApiServiceInterface {
   user = {
@@ -8,4 +10,8 @@ export class MockApiService implements ApiServiceInterface {
   };
 
   collab = {};
+
+  matching = {
+    requestForMatch: matching.requestForMatch
+  };
 }

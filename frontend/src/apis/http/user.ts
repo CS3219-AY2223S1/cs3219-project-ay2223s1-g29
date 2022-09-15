@@ -1,4 +1,4 @@
-import { LoginPostData, RegisterPostData, RegisterResponse, LoginResponse } from '../../types/api/user.type';
+import { LoginPostData, RegisterPostData, RegisterResponse, LoginResponse } from '../types/user.type';
 import ENV from "../../env";
 import { httpPost } from '.'
 import { AxiosPromise } from 'axios';

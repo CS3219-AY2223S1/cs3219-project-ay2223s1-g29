@@ -5,8 +5,10 @@ import UserHomeCard from '../../components/user/UserHomeCard';
 import { useAuth } from '../../context/AuthContext';
 import { Step, Steps, useSteps } from 'chakra-ui-steps';
 import MatchingIndicator from '../../components/matching/MatchingIndicator';
-import { DIFFICULTY } from '../../components/question/utils';
+import { DIFFICULTY, serializeDifficulty } from '../../components/question/utils';
 import useIsMobile from '../../hooks/useIsMobile';
+import { useApiSvc } from '../../context/ApiServiceContext';
+import { isApiError } from '../../apis/interface';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -15,8 +17,12 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const { username, token } = useAuth();
+  const { username, token, userId } = useAuth();
   const isMobile = useIsMobile();
+
+  const {
+    matching: { requestForMatch },
+  } = useApiSvc();
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
@@ -37,14 +43,22 @@ export default function Home() {
 
   const onClickHandler = useCallback(
     (difficulty: DIFFICULTY) => {
-      nextStep();
       setDifficulty(difficulty);
 
-      // send api call to match
-      // if ok, begin countdown
-      setTimeLeft(60);
+      requestForMatch(token, {
+        userid: userId,
+        difficulty: serializeDifficulty(difficulty),
+      }).then((res) => {
+        if (isApiError(res)) {
+          setMsg('Please try again later.');
+          return;
+        }
+
+        nextStep();
+        setTimeLeft(60);
+      });
     },
-    [activeStep],
+    [token],
   );
 
   useEffect(() => {

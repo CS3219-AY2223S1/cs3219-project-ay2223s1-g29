@@ -1,3 +1,5 @@
+import { MatchPostData } from "../../apis/types/matching.type"
+
 export const enum DIFFICULTY {
   EASY = 'Easy',
   MEDIUM = 'Medium',
@@ -16,5 +18,19 @@ export function getColor(difficulty: DIFFICULTY): string {
     case DIFFICULTY.RANDOM:
     default:
       return "purple.300"
+  }
+}
+
+const modes = ['easy', 'medium', 'hard']
+export function serializeDifficulty(d: DIFFICULTY): MatchPostData['difficulty'] {
+  switch (d) {
+    case DIFFICULTY.EASY:
+      return 'easy'
+    case DIFFICULTY.MEDIUM:
+      return 'medium'
+    case DIFFICULTY.HARD:
+      return 'hard'
+    default:
+      return modes[Math.floor(Math.random() * 3)] as MatchPostData['difficulty'];
   }
 }
