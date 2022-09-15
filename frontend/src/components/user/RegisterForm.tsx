@@ -1,17 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-  FormErrorMessage,
-  FormLabel,
-  FormControl,
-  Input,
-  Button,
-  Flex,
-  FormHelperText,
-  Box,
-} from '@chakra-ui/react';
-import UserApi from '../../apis/UserApi';
+import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
 import { useOptionalAuth } from '../../context/AuthContext';
+import { useApiSvc } from '../../context/ApiServiceContext';
+import { isApiError } from '../../apis/interface';
 
 type RegisterFormValues = {
   username: string;
@@ -27,19 +19,25 @@ export default function RegisterForm() {
     getValues,
   } = useForm<RegisterFormValues>();
 
+  const {
+    user: { register: apiRegister },
+  } = useApiSvc();
+
   const { setAuth } = useOptionalAuth();
   const [registerErr, setRegisterErr] = useState<string>('');
 
   const onSubmit = useCallback((values: RegisterFormValues) => {
-    UserApi.register(values)
-      .then((res) => {
-        const {
-          data: { id, token, username },
-        } = res;
-        setAuth({ id, username }, token);
-        window.location.reload();
-      })
-      .catch((err) => setRegisterErr(err.message));
+    apiRegister(values).then((res) => {
+      if (isApiError(res)) {
+        return;
+      }
+
+      const {
+        data: { id, token, username },
+      } = res;
+      setAuth({ id, username }, token);
+      window.location.reload();
+    });
   }, []);
 
   const validateCfmPassword = useCallback(

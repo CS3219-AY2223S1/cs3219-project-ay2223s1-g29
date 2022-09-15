@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMessage, FormLabel, FormControl, Input, Button, Flex } from '@chakra-ui/react';
-import UserApi from '../../apis/UserApi';
 import { useOptionalAuth } from '../../context/AuthContext';
+import { useApiSvc } from '../../context/ApiServiceContext';
+import { isApiError } from '../../apis/interface';
 
 type LoginFormValues = {
   username: string;
@@ -16,12 +17,20 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>();
 
+  const {
+    user: { login: apiLogin },
+  } = useApiSvc();
+
   const { setAuth } = useOptionalAuth();
   const [loginErr, setLoginErr] = useState<string>('');
 
   const onSubmit = useCallback((values: { username: string; password: string }) => {
-    UserApi.login(values)
+    apiLogin(values)
       .then((res) => {
+        if (isApiError(res)) {
+          return;
+        }
+
         const {
           data: { id, token, username },
         } = res;

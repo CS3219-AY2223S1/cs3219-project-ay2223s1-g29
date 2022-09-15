@@ -48,7 +48,7 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (timeLeft <= 0) {
+    if (timeLeft < 0) {
       reset();
       setMsg('Could not find you a match.\nPlease try again later!');
       return;
