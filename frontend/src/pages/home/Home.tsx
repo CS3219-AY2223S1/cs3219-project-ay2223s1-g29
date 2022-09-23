@@ -10,6 +10,8 @@ import useIsMobile from '../../hooks/useIsMobile';
 import { useApiSvc } from '../../context/ApiServiceContext';
 import { isApiError } from '../../apis/interface';
 import useInterval from '../../hooks/useInterval';
+import CollabSuccess from '../../components/collab/CollabSuccess';
+import { GetRoomRes } from '../../apis/types/collab.type';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -28,6 +30,7 @@ export default function Home() {
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
+  const [room, setRoom] = useState<GetRoomRes | undefined>();
   const [msg, setMsg] = useState<string>('');
 
   const {
@@ -63,6 +66,7 @@ export default function Home() {
     [token],
   );
 
+  // set timeout to do polling
   useEffect(() => {
     if (!difficulty) {
       return;
@@ -71,7 +75,12 @@ export default function Home() {
     if (timeLeft < 0) {
       reset();
       setDifficulty(undefined);
+      setRoom(undefined);
       setMsg('Could not find you a match.\nPlease try again later!');
+      return;
+    }
+
+    if (room) {
       return;
     }
 
@@ -82,10 +91,15 @@ export default function Home() {
     return () => {
       clearInterval(timeout);
     };
-  }, [timeLeft, difficulty]);
+  }, [timeLeft, difficulty, room]);
 
+  // code that does the actual api polling
   useInterval(() => {
     if (!difficulty) {
+      return;
+    }
+
+    if (room) {
       return;
     }
 
@@ -93,6 +107,8 @@ export default function Home() {
       if (isApiError(res)) {
         return;
       }
+
+      setRoom(res.data);
 
       nextStep();
       new Promise(() => setTimeout(() => nextStep(), 300));
@@ -121,6 +137,9 @@ export default function Home() {
               {activeStep === 1 && difficulty && (
                 <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
               )}
+              {activeStep > 1 && difficulty && room && (
+                <CollabSuccess username={username} difficulty={difficulty} roomId={room.roomId} />
+              )}
             </Box>
           </>
         )}
@@ -128,13 +147,16 @@ export default function Home() {
         {isMobile && (
           <Flex direction="column" align="center" justify="center">
             <Text fontSize="1xl" mb={2}>
-              {STEPS[activeStep].label}
+              {STEPS[activeStep]?.label ?? ''}
             </Text>
 
             <Box alignSelf="center" width="250px">
               {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
               {activeStep === 1 && difficulty && (
                 <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+              )}
+              {activeStep > 1 && difficulty && room && (
+                <CollabSuccess username={username} difficulty={difficulty} roomId={room.roomId} />
               )}
             </Box>
           </Flex>
