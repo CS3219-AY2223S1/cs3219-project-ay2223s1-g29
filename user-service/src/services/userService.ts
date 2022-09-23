@@ -3,6 +3,7 @@ import { UserUpdateOptions } from '../models/user';
 import UserRepo from '../repository/userRepo';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Exception } from '../exceptions';
 
 const ROUNDS = 10;
 
@@ -16,18 +17,23 @@ const generateJWT = (username: string) => {
 const register = async (username: string, password: string) => {
   logger.info(`Creating user with username: ${username}`);
   let hashedPassword = await bcrypt.hash(password, ROUNDS);
-  const newUser = await UserRepo.createUser({
-    username,
-    password: hashedPassword,
-  });
-  if (!newUser) {
-    throw new Error(`Failed to create user with username: ${username}`);
+  try {
+    const newUser = await UserRepo.createUser({
+      username,
+      password: hashedPassword,
+    });
+    if (!newUser) {
+      throw new Exception(`Failed to create user with username: ${username}`, 400);
+    }
+    return {
+      token: generateJWT(username),
+      id: newUser._id,
+      username: newUser.username,
+    };
   }
-  return {
-    token: generateJWT(username),
-    id: newUser._id,
-    username: newUser.username,
-  };
+  catch (err) {
+    throw new Exception(`username: ${username} is already taken`, 400);
+  }
 };
 
 const updateUser = async (username: string, updatedUserFields: UserUpdateOptions) => {
@@ -37,7 +43,7 @@ const updateUser = async (username: string, updatedUserFields: UserUpdateOptions
   }
   const updatedUser = await UserRepo.updateUser(username, updatedUserFields);
   if (!updatedUser) {
-    throw new Error(`Failed to update user with id: ${username}`);
+    throw new Exception(`Failed to update user with id: ${username}`, 404);
   }
   return updatedUser;
 };
@@ -46,11 +52,11 @@ const login = async (username: string, password: string) => {
   logger.info(`Logging in username: ${username}`);
   const user = await UserRepo.getUser(username);
   if (!user) {
-    throw new Error(`Failed to get user with id: ${username}`);
+    throw new Exception(`Failed to get user with id: ${username}`, 404);
   }
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) {
-    throw new Error(`Incorrect password for username: ${username}`);
+    throw new Exception(`Incorrect password for username: ${username}`, 401);
   }
   return {
     token: generateJWT(username),
@@ -63,10 +69,10 @@ const deleteUser = async (username: string) => {
   logger.info(`Deleting ${username}'s account`);
   const deletedUser = await UserRepo.deleteUser(username);
   if (!deletedUser) {
-    throw new Error(`Failed to delete ${username}'s account`);
+    throw new Exception(`Failed to delete ${username}'s account`, 404);
   }
   if (deletedUser.deletedCount === 0) {
-    throw new Error(`${username}'s account does not exist!`);
+    throw new Exception(`${username}'s account does not exist!`, 404);
   }
   return deletedUser;
 };
