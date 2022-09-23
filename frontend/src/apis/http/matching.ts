@@ -9,7 +9,7 @@ const BASE_URL = ENV.MATCHING_API
 
 export default class MatchingApi {
   static async requestForMatch(token: string, d: MatchPostData): Promise<ApiResponse<EmptyObj>> {
-    return httpPost(`${BASE_URL}/register`, {
+    return httpPost(`${BASE_URL}/match`, {
       ...getAuthHeader(token)
     }, d)
       .then(res => ({ data: res.data, err: null }))
