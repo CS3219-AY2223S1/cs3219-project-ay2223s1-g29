@@ -1,3 +1,4 @@
 node_modules
 .dccache
 user-service/.env
+user-service/dist
