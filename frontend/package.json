@@ -6,17 +6,31 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gcp-build": "tsc && vite build",
+    "gcp-deploy": "gcloud app deploy"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.3.2",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
     "axios": "^0.27.2",
+    "chakra-ui-steps": "^1.7.4",
     "formik": "^2.2.9",
+    "framer-motion": "^7.3.4",
     "react": "^18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.35.0",
+    "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "yup": "^0.32.11"
   },
+  "engines": {
+    "node": "16.x.x"
+  },
   "devDependencies": {
+    "@types/node": "^18.7.17",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.1",

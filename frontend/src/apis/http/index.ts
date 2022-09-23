@@ -1,4 +1,23 @@
+import { ApiServiceInterface } from './../interface';
 import axios, { AxiosRequestHeaders } from 'axios';
+import UserApi from './user';
+import MatchingApi from './matching';
+import CollabApi from './collab';
+
+export class ApiService implements ApiServiceInterface {
+  user = {
+    register: UserApi.register,
+    login: UserApi.login
+  };
+
+  collab = {
+    getRoom: CollabApi.getRoom
+  };
+
+  matching = {
+    requestForMatch: MatchingApi.requestForMatch
+  }
+}
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
   axios({
@@ -30,3 +49,5 @@ export const httpDelete = async (url: string, headers: AxiosRequestHeaders) =>
     url,
     headers,
   });
+
+
