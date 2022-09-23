@@ -24,7 +24,8 @@ export default(app: Router) => {
                     console.log("queue is not empty, there is a match");
                     // TODO: notify collab service that there is a match by calling collab service api
                     const userId2:string = MatchingService.popQueue(difficulty);
-                    CollabService.createMatch(userid, userId2, difficulty);
+                    const data = (await CollabService.createMatch(userid, userId2, difficulty)).data;
+                    console.log(data);
                 }
                 res.json({'status': 'matching user'}).status(200);
             } else {
