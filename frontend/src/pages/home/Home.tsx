@@ -9,6 +9,7 @@ import { DIFFICULTY, serializeDifficulty } from '../../components/question/utils
 import useIsMobile from '../../hooks/useIsMobile';
 import { useApiSvc } from '../../context/ApiServiceContext';
 import { isApiError } from '../../apis/interface';
+import useInterval from '../../hooks/useInterval';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -22,6 +23,7 @@ export default function Home() {
 
   const {
     matching: { requestForMatch },
+    collab: { getRoom },
   } = useApiSvc();
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -42,12 +44,12 @@ export default function Home() {
   }, [resetStep]);
 
   const onClickHandler = useCallback(
-    (difficulty: DIFFICULTY) => {
-      setDifficulty(difficulty);
+    (selectedDifficulty: DIFFICULTY) => {
+      setDifficulty(selectedDifficulty);
 
       requestForMatch(token, {
         userid: userId,
-        difficulty: serializeDifficulty(difficulty),
+        difficulty: serializeDifficulty(selectedDifficulty),
       }).then((res) => {
         if (isApiError(res)) {
           setMsg('Please try again later.');
@@ -62,8 +64,13 @@ export default function Home() {
   );
 
   useEffect(() => {
+    if (!difficulty) {
+      return;
+    }
+
     if (timeLeft < 0) {
       reset();
+      setDifficulty(undefined);
       setMsg('Could not find you a match.\nPlease try again later!');
       return;
     }
@@ -75,7 +82,22 @@ export default function Home() {
     return () => {
       clearInterval(timeout);
     };
-  }, [timeLeft]);
+  }, [timeLeft, difficulty]);
+
+  useInterval(() => {
+    if (!difficulty) {
+      return;
+    }
+
+    getRoom(token).then((res) => {
+      if (isApiError(res)) {
+        return;
+      }
+
+      nextStep();
+      new Promise(() => setTimeout(() => nextStep(), 300));
+    });
+  }, 5000);
 
   return (
     <Center flexDirection="column" h="100vh">
