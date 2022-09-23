@@ -1,4 +1,6 @@
+import { Socket } from 'socket.io-client';
 import { EmptyObj } from './../utils.type';
+import { GetRoomRes } from './types/collab.type';
 import { MatchPostData } from './types/matching.type';
 import { LoginPostData, LoginResponse } from './types/user.type';
 import { RegisterPostData, RegisterResponse } from "./types/user.type"
@@ -15,11 +17,13 @@ export interface ApiServiceInterface {
   },
   collab: {
     // TODO
-    getRoom: (token: string) => Promise<ApiResponse<EmptyObj>>
+    getRoom: (token: string) => Promise<ApiResponse<GetRoomRes>>
   },
   matching: {
     requestForMatch: (token: string, d: MatchPostData) => Promise<ApiResponse<EmptyObj>>
-  }
+  },
+
+  socket: Socket
 }
 
 export function isApiError<T>(d: ApiResponse<T>): d is Error {

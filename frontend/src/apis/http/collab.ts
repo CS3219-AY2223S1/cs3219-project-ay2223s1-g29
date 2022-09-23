@@ -1,3 +1,4 @@
+import { GetRoomRes } from './../types/collab.type';
 import { EmptyObj } from './../../utils.type';
 import { httpGet } from ".";
 import ENV from "../../env";
@@ -8,7 +9,7 @@ const BASE_URL = ENV.COLLAB_API
 
 export default class CollabApi {
   // TODO
-  static async getRoom(token: string): Promise<ApiResponse<EmptyObj>> {
+  static async getRoom(token: string): Promise<ApiResponse<GetRoomRes>> {
     return httpGet(`${BASE_URL}`, {
       ...getAuthHeader(token)
     }, {})

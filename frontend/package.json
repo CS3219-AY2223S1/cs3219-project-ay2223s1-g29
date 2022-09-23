@@ -24,6 +24,8 @@
     "react-hook-form": "^7.35.0",
     "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
+    "socket.io": "^4.5.2",
+    "socket.io-client": "^4.5.2",
     "yup": "^0.32.11"
   },
   "engines": {

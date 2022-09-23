@@ -3,6 +3,7 @@ import axios, { AxiosRequestHeaders } from 'axios';
 import UserApi from './user';
 import MatchingApi from './matching';
 import CollabApi from './collab';
+import { io } from 'socket.io-client';
 
 export class ApiService implements ApiServiceInterface {
   user = {
@@ -16,7 +17,9 @@ export class ApiService implements ApiServiceInterface {
 
   matching = {
     requestForMatch: MatchingApi.requestForMatch
-  }
+  };
+
+  socket = io();
 }
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
