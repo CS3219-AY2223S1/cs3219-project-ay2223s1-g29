@@ -1,5 +1,7 @@
-import { LoginPostData, LoginResponse } from './../types/api/user.type';
-import { RegisterPostData, RegisterResponse } from "../types/api/user.type"
+import { EmptyObj } from './../utils.type';
+import { MatchPostData } from './types/matching.type';
+import { LoginPostData, LoginResponse } from './types/user.type';
+import { RegisterPostData, RegisterResponse } from "./types/user.type"
 
 type Success<ResBody> = { data: ResBody, err: null }
 type Error = { data: null, err: string }
@@ -12,7 +14,11 @@ export interface ApiServiceInterface {
     login: (d: LoginPostData) => Promise<ApiResponse<LoginResponse>>
   },
   collab: {
-
+    // TODO
+    getRoom: (token: string) => Promise<ApiResponse<EmptyObj>>
+  },
+  matching: {
+    requestForMatch: (token: string, d: MatchPostData) => Promise<ApiResponse<EmptyObj>>
   }
 }
 

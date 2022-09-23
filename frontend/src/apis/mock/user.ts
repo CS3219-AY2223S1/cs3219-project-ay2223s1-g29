@@ -1,4 +1,4 @@
-import { LoginPostData, LoginResponse, RegisterPostData, RegisterResponse } from "../../types/api/user.type";
+import { LoginPostData, LoginResponse, RegisterPostData, RegisterResponse } from "../types/user.type";
 import { ApiResponse } from "../interface";
 
 async function register(d: RegisterPostData): Promise<ApiResponse<RegisterResponse>> {

@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { useCookies } from 'react-cookie';
-import { IOptionalAuthContext, IAuthContext } from '../types/context/AuthContext';
+import { IOptionalAuthContext, IAuthContext } from './types/AuthContext';
 
 const AuthContext = createContext<IOptionalAuthContext | null>(null);
 

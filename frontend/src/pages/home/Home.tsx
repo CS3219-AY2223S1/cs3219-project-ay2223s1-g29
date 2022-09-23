@@ -5,8 +5,11 @@ import UserHomeCard from '../../components/user/UserHomeCard';
 import { useAuth } from '../../context/AuthContext';
 import { Step, Steps, useSteps } from 'chakra-ui-steps';
 import MatchingIndicator from '../../components/matching/MatchingIndicator';
-import { DIFFICULTY } from '../../components/question/utils';
+import { DIFFICULTY, serializeDifficulty } from '../../components/question/utils';
 import useIsMobile from '../../hooks/useIsMobile';
+import { useApiSvc } from '../../context/ApiServiceContext';
+import { isApiError } from '../../apis/interface';
+import useInterval from '../../hooks/useInterval';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -15,8 +18,13 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const { username, token } = useAuth();
+  const { username, token, userId } = useAuth();
   const isMobile = useIsMobile();
+
+  const {
+    matching: { requestForMatch },
+    collab: { getRoom },
+  } = useApiSvc();
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
@@ -36,20 +44,33 @@ export default function Home() {
   }, [resetStep]);
 
   const onClickHandler = useCallback(
-    (difficulty: DIFFICULTY) => {
-      nextStep();
-      setDifficulty(difficulty);
+    (selectedDifficulty: DIFFICULTY) => {
+      setDifficulty(selectedDifficulty);
 
-      // send api call to match
-      // if ok, begin countdown
-      setTimeLeft(60);
+      requestForMatch(token, {
+        userid: userId,
+        difficulty: serializeDifficulty(selectedDifficulty),
+      }).then((res) => {
+        if (isApiError(res)) {
+          setMsg('Please try again later.');
+          return;
+        }
+
+        nextStep();
+        setTimeLeft(60);
+      });
     },
-    [activeStep],
+    [token],
   );
 
   useEffect(() => {
+    if (!difficulty) {
+      return;
+    }
+
     if (timeLeft < 0) {
       reset();
+      setDifficulty(undefined);
       setMsg('Could not find you a match.\nPlease try again later!');
       return;
     }
@@ -61,7 +82,22 @@ export default function Home() {
     return () => {
       clearInterval(timeout);
     };
-  }, [timeLeft]);
+  }, [timeLeft, difficulty]);
+
+  useInterval(() => {
+    if (!difficulty) {
+      return;
+    }
+
+    getRoom(token).then((res) => {
+      if (isApiError(res)) {
+        return;
+      }
+
+      nextStep();
+      new Promise(() => setTimeout(() => nextStep(), 300));
+    });
+  }, 5000);
 
   return (
     <Center flexDirection="column" h="100vh">

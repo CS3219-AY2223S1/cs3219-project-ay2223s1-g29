@@ -1,5 +1,7 @@
 import { ApiServiceInterface } from "../interface";
 import user from './user'
+import matching from './matching'
+import collab from './collab'
 
 export class MockApiService implements ApiServiceInterface {
   user = {
@@ -7,5 +9,11 @@ export class MockApiService implements ApiServiceInterface {
     login: user.login
   };
 
-  collab = {};
+  collab = {
+    getRoom: collab.getRoom
+  };
+
+  matching = {
+    requestForMatch: matching.requestForMatch
+  };
 }

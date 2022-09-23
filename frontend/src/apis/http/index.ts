@@ -1,7 +1,8 @@
 import { ApiServiceInterface } from './../interface';
 import axios, { AxiosRequestHeaders } from 'axios';
-import { RegisterPostData, RegisterResponse, LoginPostData } from '../../types/api/user.type';
 import UserApi from './user';
+import MatchingApi from './matching';
+import CollabApi from './collab';
 
 export class ApiService implements ApiServiceInterface {
   user = {
@@ -9,7 +10,13 @@ export class ApiService implements ApiServiceInterface {
     login: UserApi.login
   };
 
-  collab = {};
+  collab = {
+    getRoom: CollabApi.getRoom
+  };
+
+  matching = {
+    requestForMatch: MatchingApi.requestForMatch
+  }
 }
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
