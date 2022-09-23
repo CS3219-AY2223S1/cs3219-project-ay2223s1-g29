@@ -24,7 +24,7 @@ const addQueue = (user:string, difficulty:string) => {
     }
 }
 
-const popQueue = (difficulty:string) => {
+const popQueue = (difficulty:string):any => {
     switch (difficulty) {
         case "easy":
             console.log(easyQueue);
