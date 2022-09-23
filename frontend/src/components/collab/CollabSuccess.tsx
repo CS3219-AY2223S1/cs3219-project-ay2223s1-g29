@@ -7,6 +7,7 @@ type CollabSuccessProps = {
   username: string;
   difficulty: DIFFICULTY;
   roomId: string;
+  altUser: string;
 };
 
 export default function CollabSuccess(props: CollabSuccessProps) {
@@ -16,6 +17,7 @@ export default function CollabSuccess(props: CollabSuccessProps) {
     navigate('/collab', {
       state: {
         roomId: props.roomId,
+        altUser: props.altUser,
       },
     });
   }, []);
