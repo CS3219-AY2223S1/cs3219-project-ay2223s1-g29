@@ -2,3 +2,5 @@ node_modules
 .dccache
 user-service/.env
 user-service/dist
+collab-service/.env
+collab-service/dist
