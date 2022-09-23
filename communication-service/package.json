@@ -1,0 +1,28 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "Real-time chat application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whatthelump/ChatApp.git"
+  },
+  "author": "LLG",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/whatthelump/ChatApp/issues"
+  },
+  "homepage": "https://github.com/whatthelump/ChatApp#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "moment": "^2.29.4",
+    "socket.io": "^4.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
