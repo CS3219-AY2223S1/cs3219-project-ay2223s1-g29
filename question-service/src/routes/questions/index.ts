@@ -12,33 +12,32 @@ const medium = ["Given a string s, find the length of the longest substring with
 const hard = ["Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2. \n You can insert a character, delete a character or replace a character",
 "Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring."]
 
+const questions = [easy, medium, hard];
+
 export default(app: Router) => {
     app.use('/questions', route);
 
     // api for easy questions
     route.get(
-        '/easy',
+        '/:difficulty',
         wrap(async (req:Request, res:Response) => {
-            console.log("getting easy");
-            res.json(easy[Math.floor(Math.random()*easy.length)]).status(200);
-        })
-    )
+            const {difficulty} = req.params;
 
-    // api for medium questions
-    route.get(
-        '/medium',
-        wrap(async (req:Request, res:Response) => {
-            console.log("getting medium");
-            res.json(medium[Math.floor(Math.random()*easy.length)]).status(200);
-        })
-    )
-
-    // api for hard questions
-    route.get(
-        '/hard',
-        wrap(async (req:Request, res:Response) => {
-            console.log("getting hard");
-            res.json(hard[Math.floor(Math.random()*easy.length)]).status(200);
+            switch (difficulty) {
+                case "easy":
+                    res.json(easy[Math.floor(Math.random()*easy.length)]).status(200);       
+                    break;
+                case "medium":
+                    res.json(medium[Math.floor(Math.random()*medium.length)]).status(200);
+                    break;
+                case "hard":
+                    res.json(hard[Math.floor(Math.random()*hard.length)]).status(200);
+                    break;
+                default:
+                    console.log("random question");
+                    // TODO: pick a random question
+                    res.json(questions[Math.floor(Math.random()*questions.length)][Math.floor(Math.random()*hard.length)]).status(200);
+            }
         })
     )
 };
