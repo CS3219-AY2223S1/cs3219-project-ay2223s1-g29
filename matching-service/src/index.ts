@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
+import config from './config';
 
 const main =async () => {
   const app = express.default();
@@ -16,8 +17,8 @@ const main =async () => {
 
   app.get('/', (req, res) => res.send('Hello World with Express'));
 
-  app.listen(8001, () => {
-    console.log("Listening on port " + 8001);
+  app.listen(config.port, () => {
+    console.log("Listening on port " + config.port);
   });
 }
 
