@@ -11,4 +11,8 @@ if (!envFound) {
 export default {
   // Application port.
   port: parseInt(process.env.PORT) || 7001,
+
+  database: {
+    url: "mongodb://localhost",
+},
 };
