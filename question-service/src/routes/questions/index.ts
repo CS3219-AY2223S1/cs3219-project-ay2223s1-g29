@@ -25,18 +25,18 @@ export default(app: Router) => {
 
             switch (difficulty) {
                 case "easy":
-                    res.json(easy[Math.floor(Math.random()*easy.length)]).status(200);       
+                    res.json({"question": easy[Math.floor(Math.random()*easy.length)]}).status(200);       
                     break;
                 case "medium":
-                    res.json(medium[Math.floor(Math.random()*medium.length)]).status(200);
+                    res.json({"question": medium[Math.floor(Math.random()*medium.length)]}).status(200);
                     break;
                 case "hard":
-                    res.json(hard[Math.floor(Math.random()*hard.length)]).status(200);
+                    res.json({"question": hard[Math.floor(Math.random()*hard.length)]}).status(200);
                     break;
                 default:
                     console.log("random question");
                     // TODO: pick a random question
-                    res.json(questions[Math.floor(Math.random()*questions.length)][Math.floor(Math.random()*hard.length)]).status(200);
+                    res.json({"question": questions[Math.floor(Math.random()*questions.length)][Math.floor(Math.random()*hard.length)]}).status(200);
             }
         })
     )
