@@ -1,6 +1,7 @@
 import { Request, Response, Router} from 'express';
 import wrap from 'express-async-handler';
 import MatchingService from '../../services/matchingService';
+import CollabService from '../../services/collabService';
 
 const route = Router();
 
@@ -22,7 +23,9 @@ export default(app: Router) => {
                 } else {
                     console.log("queue is not empty, there is a match");
                     // TODO: notify collab service that there is a match by calling collab service api
-                    MatchingService.popQueue(difficulty);
+                    const userId2:string = MatchingService.popQueue(difficulty);
+                    const data = (await CollabService.createMatch(userid, userId2, difficulty)).data;
+                    console.log(data);
                 }
                 res.json({'status': 'matching user'}).status(200);
             } else {
