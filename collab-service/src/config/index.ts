@@ -12,6 +12,11 @@ export default {
   // Application port.
   port: parseInt(process.env.PORT) || 3001,
 
+  // Questions service url.
+  questionsServiceUrl:
+    process.env.QUESTIONS_SERVICE_URL ||
+    'https://cs3219-question-service-dot-cs3219-363515.as.r.appspot.com/api/questions',
+
   // DB connection options.
   database: {
     url: process.env.DB_URL,

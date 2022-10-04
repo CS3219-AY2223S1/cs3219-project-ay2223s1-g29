@@ -1,7 +1,13 @@
 import { logger } from '../loggers/logger';
 import RoomRepo from '../repository/roomRepo';
 import { Exception } from '../exceptions';
+import axios from 'axios';
+import config from '../config';
 
+const getQuestion = async (difficulty:string) => {
+  const res = await axios.get(config.questionsServiceUrl + `/${difficulty}`);
+  return res.data.question;
+};
 
 const createMatch = async (userId1: string, userId2: string, difficulty: string) => {
   logger.info(`Matching ${userId1} and ${userId2} with difficulty ${difficulty}`);
@@ -10,7 +16,7 @@ const createMatch = async (userId1: string, userId2: string, difficulty: string)
       userId1,
       userId2,
       difficulty,
-      question: 'test question',
+      question: await getQuestion(difficulty),
     });
     return newRoom;
   }
