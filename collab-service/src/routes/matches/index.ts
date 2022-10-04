@@ -15,4 +15,12 @@ export default (app: Router) => {
       res.json(newMatch).status(200);
     }),
   );
+
+  route.get(
+    '/status/:userid',
+    wrap(async (req: Request, res: Response) => {
+      const room = await CollabService.getRoomByUserId(req.params.userid);
+      res.json({ room }).status(200);
+    }
+  ));
 };
