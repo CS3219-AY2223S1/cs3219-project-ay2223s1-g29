@@ -11,12 +11,19 @@ const getQuestion = async (difficulty:string) => {
 
 const createMatch = async (userId1: string, userId2: string, difficulty: string) => {
   logger.info(`Matching ${userId1} and ${userId2} with difficulty ${difficulty}`);
+  const TIME_OUT_IN_MS = 1000 * 60 * 60 * 6; // 6 hours
+  const isRoomExist = await RoomRepo.getRoomByUserId(userId1) || await RoomRepo.getRoomByUserId(userId2);
+  if (isRoomExist) {
+    logger.warn(`Room already exists for user ${userId1} or ${userId2}`);
+    throw new Exception(`Room already exists for user ${userId1} or ${userId2}`, 409);
+  }
   try {
     const newRoom = RoomRepo.createRoom({
       userId1,
       userId2,
       difficulty,
       question: await getQuestion(difficulty),
+      endTime: new Date(Date.now() + TIME_OUT_IN_MS),
     });
     return newRoom;
   }
@@ -25,9 +32,18 @@ const createMatch = async (userId1: string, userId2: string, difficulty: string)
   }
 };
 
+const getRoomByUserId = async (userId: string) => {
+  const room = await RoomRepo.getRoomByUserId(userId);
+  if (!room) {
+    throw new Exception(`No room found for user ${userId}`, 404);
+  }
+  return room;
+};
+
 
 const CollabService = {
   createMatch,
+  getRoomByUserId,
 };
 
 export { CollabService as default };

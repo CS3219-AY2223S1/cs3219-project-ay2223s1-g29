@@ -6,6 +6,7 @@ export interface Room {
   userId2: string;
   difficulty: string;
   question: string;
+  endTime: Date;
 }
 
 const roomSchema = new mongoose.Schema({
@@ -23,6 +24,10 @@ const roomSchema = new mongoose.Schema({
   },
   question: {
     type: String,
+    required: true,
+  },
+  endTime: {
+    type: Date,
     required: true,
   },
 });
