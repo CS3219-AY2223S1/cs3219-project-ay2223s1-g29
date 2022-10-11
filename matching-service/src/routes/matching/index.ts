@@ -2,6 +2,7 @@ import { Request, Response, Router} from 'express';
 import wrap from 'express-async-handler';
 import MatchingService from '../../services/matchingService';
 import CollabService from '../../services/collabService';
+import verifyToken from '../../middlewares/auth'
 
 const route = Router();
 
@@ -11,8 +12,10 @@ export default(app: Router) => {
     // create
     route.post(
         '/',
+        verifyToken,
         wrap(async (req:Request, res:Response) => {
-            const {userid, difficulty} = req.body;
+            const {difficulty} = req.body;
+            const userid = req.params.username
             console.log(userid, difficulty);
             if (userid && difficulty) {
                 // check if queue is empty
