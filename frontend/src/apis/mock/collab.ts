@@ -1,12 +1,16 @@
 import { EmptyObj } from "../../utils.type";
 import { ApiResponse } from "../interface";
+import { GetRoomRes } from "../types/collab.type";
 
-async function getRoom(token: string): Promise<ApiResponse<EmptyObj>> {
+async function getRoom(token: string): Promise<ApiResponse<GetRoomRes>> {
   const rand = Math.random()
 
   if (rand >= 0.6) {
     return {
       data: {
+        roomId: '123',
+        altUser: 'bananananana',
+        question: 'Why did the chicken cross the road?'
       },
       err: null
     }
