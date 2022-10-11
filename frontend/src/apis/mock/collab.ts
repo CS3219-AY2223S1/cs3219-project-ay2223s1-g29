@@ -9,7 +9,8 @@ async function getRoom(token: string): Promise<ApiResponse<GetRoomRes>> {
     return {
       data: {
         roomId: '123',
-        altUser: 'bananananana'
+        altUser: 'bananananana',
+        question: 'Why did the chicken cross the road?'
       },
       err: null
     }

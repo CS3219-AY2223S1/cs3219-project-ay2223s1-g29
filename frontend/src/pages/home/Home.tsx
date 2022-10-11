@@ -137,14 +137,7 @@ export default function Home() {
               {activeStep === 1 && difficulty && (
                 <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
               )}
-              {activeStep > 1 && difficulty && room && (
-                <CollabSuccess
-                  username={username}
-                  difficulty={difficulty}
-                  roomId={room.roomId}
-                  altUser={room.altUser}
-                />
-              )}
+              {activeStep > 1 && difficulty && room && <CollabSuccess getRoomRes={room} />}
             </Box>
           </>
         )}
@@ -160,14 +153,7 @@ export default function Home() {
               {activeStep === 1 && difficulty && (
                 <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
               )}
-              {activeStep > 1 && difficulty && room && (
-                <CollabSuccess
-                  username={username}
-                  difficulty={difficulty}
-                  roomId={room.roomId}
-                  altUser={room.altUser}
-                />
-              )}
+              {activeStep > 1 && room && <CollabSuccess getRoomRes={room} />}
             </Box>
           </Flex>
         )}

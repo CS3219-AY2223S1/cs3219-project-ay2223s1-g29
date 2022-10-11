@@ -1,4 +1,5 @@
 export type GetRoomRes = {
   roomId: string,
-  altUser: string
+  altUser: string,
+  question: string
 }

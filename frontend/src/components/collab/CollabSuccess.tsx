@@ -2,12 +2,10 @@ import React, { useCallback } from 'react';
 import { DIFFICULTY } from '../question/utils';
 import { Button, Center, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { GetRoomRes } from '../../apis/types/collab.type';
 
 type CollabSuccessProps = {
-  username: string;
-  difficulty: DIFFICULTY;
-  roomId: string;
-  altUser: string;
+  getRoomRes: GetRoomRes;
 };
 
 export default function CollabSuccess(props: CollabSuccessProps) {
@@ -16,8 +14,7 @@ export default function CollabSuccess(props: CollabSuccessProps) {
   const onStart = useCallback(() => {
     navigate('/collab', {
       state: {
-        roomId: props.roomId,
-        altUser: props.altUser,
+        getRoomRes: props.getRoomRes,
       },
     });
   }, []);
@@ -25,7 +22,7 @@ export default function CollabSuccess(props: CollabSuccessProps) {
   return (
     <Center flexDirection="column" width="fit-content">
       <Text fontSize="xl">Success!</Text>
-      <Text fontSize="lg">You have been matched with {props.altUser}.</Text>
+      <Text fontSize="lg">You have been matched with {props.getRoomRes.altUser}.</Text>
       <Button type="button" onClick={onStart}>
         Let&nbsp;start!
       </Button>
