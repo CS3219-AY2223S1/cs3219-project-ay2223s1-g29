@@ -15,3 +15,7 @@
 
 # Node.js dependencies:
 node_modules/
+
+# No need to upload src directory
+# only need dist
+src/
