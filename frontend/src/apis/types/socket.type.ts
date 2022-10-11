@@ -8,3 +8,8 @@ export const EmitEvents = {
 export const ListenEvents = {
   RCV_MESSAGE: 'message'
 }
+
+export type ChatMsg = {
+  content: string,
+  from: string
+}
