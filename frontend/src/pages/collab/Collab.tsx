@@ -37,7 +37,7 @@ export default function Collab() {
   return (
     <Flex width="100vw" height="100vh" p={4} columnGap={2}>
       <Flex flex={1} direction="column" rowGap={2}>
-        <Box flexBasis="74%" h="100%" w="100%">
+        <Box bg="teal.800" flexBasis="74%" h="100%" w="100%" p={4} overflowY="scroll">
           <QuestionBox question={getRoomRes.question} />
         </Box>
         <Box flexBasis="24%" h="100%" w="100%">
