@@ -37,6 +37,7 @@ export default function Editor() {
 
     return () => {
       monacoBinding.destroy();
+      editor.dispose();
     };
   }, [editorRef.current]);
 

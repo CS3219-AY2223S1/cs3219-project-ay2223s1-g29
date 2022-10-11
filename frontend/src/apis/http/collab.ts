@@ -10,7 +10,7 @@ const BASE_URL = ENV.COLLAB_API
 export default class CollabApi {
   // TODO
   static async getRoom(token: string): Promise<ApiResponse<GetRoomRes>> {
-    return httpGet(`${BASE_URL}`, {
+    return httpGet(`${BASE_URL}/status`, {
       ...getAuthHeader(token)
     }, {})
       .then(res => ({ data: res.data, err: null }))
