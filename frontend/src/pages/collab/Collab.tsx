@@ -7,6 +7,7 @@ import { Box, Flex } from '@chakra-ui/react';
 import ChatBox from '../../components/communication/ChatBox';
 import QuestionBox from '../../components/question/QuestionBox';
 import { GetRoomRes } from '../../apis/types/collab.type';
+import Editor from '../../components/collab/Editor';
 
 type LocationState = {
   getRoomRes?: GetRoomRes;
@@ -14,7 +15,7 @@ type LocationState = {
 
 export default function Collab() {
   const state: LocationState = useLocation().state as LocationState;
-  const { getRoomRes } = state;
+  const getRoomRes = state?.getRoomRes;
 
   const { username, token } = useAuth();
   const { socket } = useApiSvc();
@@ -64,7 +65,9 @@ export default function Collab() {
           <ChatBox messages={messages} onSend={onSendChatMsg} />
         </Box>
       </Flex>
-      <Box flex={1}>Editor</Box>
+      <Box flex={1}>
+        <Editor />
+      </Box>
     </Flex>
   );
 }
