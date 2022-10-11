@@ -23,14 +23,19 @@ export default(app: Router) => {
                     // if it is empty, add to queue
                     console.log("queue is empty, adding to queue");
                     MatchingService.addQueue(userid, difficulty);
+                    res.json({'status': 'matching user'}).status(200);
                 } else {
                     console.log("queue is not empty, there is a match");
-                    // TODO: notify collab service that there is a match by calling collab service api
-                    const userId2:string = MatchingService.popQueue(difficulty);
-                    const data = (await CollabService.createMatch(userid, userId2, difficulty)).data;
-                    console.log(data);
+                    if (MatchingService.peekQueue(difficulty)==userid) {
+                        // edge case when the same user that is queuing request to match again 
+                        res.json({'status': 'user is already in the queue'}).status(409);
+                    } else {
+                        const userId2:string = MatchingService.popQueue(difficulty);
+                        // send the user and the matched user to collab service
+                        const data = (await CollabService.createMatch(userid, userId2, difficulty)).data;
+                        res.json({'status': 'user matched successfully'}).status(200);
+                    }
                 }
-                res.json({'status': 'matching user'}).status(200);
             } else {
                 res.status(400).send({'error': 'bad request: missing parameters'});
             }
