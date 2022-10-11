@@ -26,4 +26,13 @@ export default (app: Router) => {
       res.json({ room }).status(200);
     }
   ));
+
+  route.delete(
+    '/',
+    verifyToken,
+    wrap(async (req: Request, res: Response) => {
+      const updatedRoom = await CollabService.updateRoomEndTime(req.params.username);
+      res.json({ updatedRoom }).status(200);
+    })
+  );
 };

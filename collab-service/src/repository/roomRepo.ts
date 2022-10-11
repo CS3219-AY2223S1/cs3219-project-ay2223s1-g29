@@ -12,9 +12,19 @@ const getRoomByUserId = async (userId: string) => {
   return room;
 };
 
+const updateRoomEndTime = async (userId: String) => {
+  const updatedRoom = await RoomModel.findOneAndUpdate(
+    {$and: [{ $or: [{ userId1: userId }, { userId2: userId }] }, { endTime: { $gt: new Date() } }],},
+    { endTime: new Date()},
+    { new: true}
+  ).select('-__v').lean();
+  return updatedRoom;
+}
+
 const RoomRepo = {
   createRoom,
   getRoomByUserId,
+  updateRoomEndTime,
 };
 
 export { RoomRepo as default };

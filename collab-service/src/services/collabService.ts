@@ -40,10 +40,18 @@ const getRoomByUserId = async (userId: string) => {
   return room;
 };
 
+const updateRoomEndTime =async (userId: string) => {
+  const updatedRoom = await RoomRepo.updateRoomEndTime(userId);
+  if (!updatedRoom) {
+    throw new Exception(`No room found for user ${userId}`, 404);
+  }
+  return updatedRoom;
+}
 
 const CollabService = {
   createMatch,
   getRoomByUserId,
+  updateRoomEndTime,
 };
 
 export { CollabService as default };
