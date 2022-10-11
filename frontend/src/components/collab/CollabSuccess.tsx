@@ -25,7 +25,7 @@ export default function CollabSuccess(props: CollabSuccessProps) {
   return (
     <Center flexDirection="column" width="fit-content">
       <Text fontSize="xl">Success!</Text>
-      <Text fontSize="lg">You have been matched with {props.username}.</Text>
+      <Text fontSize="lg">You have been matched with {props.altUser}.</Text>
       <Button type="button" onClick={onStart}>
         Let&nbsp;start!
       </Button>
