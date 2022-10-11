@@ -23,7 +23,7 @@ export default function TextEditor() {
   const [quill, setQuill] = useState()
 
   useEffect(() => {
-    const s = io("http://localhost:3002")
+    const s = io.connect("http://cs3219-collab-service-dot-cs3219-361208.as.r.appspot.com/")
     setSocket(s)
 
     return () => {

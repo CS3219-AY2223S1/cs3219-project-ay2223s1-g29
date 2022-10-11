@@ -10,7 +10,7 @@ if (!envFound) {
 
 export default {
   // Application port.
-  port: parseInt(process.env.PORT) || 3001,
+  port: parseInt(process.env.PORT) || 65080,
   wsPort: parseInt(process.env.WS_PORT) || 3002,
 
   // Questions service url.

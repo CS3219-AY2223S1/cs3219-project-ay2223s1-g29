@@ -42,6 +42,9 @@ Install [Node.js and NPM](https://nodejs.org/en/download/)
 
 Inspired by Bulletproof Node.js architecture with modificatins
 
+### Enable websockets in GAE
+gcloud compute firewall-rules create default-allow-websockets     --allow tcp:65080     --target-tags websocket     --description "Allow websocket traffic on port 65080"
+
 <br>
 <br>
 
