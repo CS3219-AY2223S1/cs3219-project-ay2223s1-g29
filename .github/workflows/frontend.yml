@@ -2,19 +2,19 @@ name: frontend
 
 # Controls when the workflow will run
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths:
-      - ./frontend/**/*
+      - frontend/**/*
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allow for manual triggers
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -22,7 +22,7 @@ jobs:
     steps:
       - id: 'checkout'
         uses: actions/checkout@v3
-      
+
       - id: 'auth'
         uses: 'google-github-actions/auth@v0'
         with:
@@ -34,6 +34,6 @@ jobs:
         with:
           working_directory: './frontend'
 
-      # Check deployment outcoe
+      # Check deployment outcome
       - id: 'test'
         run: 'curl "${{ steps.deploy.outputs.url }}"'
