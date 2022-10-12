@@ -1,13 +1,12 @@
 name: frontend
 
-# Controls when the workflow will run
 on:
   push:
     branches:
       - main
     paths:
       - frontend/**/*
-
+  
   # Allow for manual triggers
   workflow_dispatch:
 
@@ -15,26 +14,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: 'read'
-      id-token: 'write'
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secret.FE_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secret.FE_SECRET_ACCESS_KEY }}
 
     steps:
-      - name: 'Checkout code'
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 'Auth'
-        uses: 'google-github-actions/auth@v0'
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
-          workload_identity_provider: 'projects/142948231110/locations/global/workloadIdentityPools/cs3219-g29-fe-pool/providers/cs3219-g29-fe-provider'
-          service_account: 'cs3219-g29-fe@cs3219-362509.iam.gserviceaccount.com'
+          cache: 'yarn'
+          cache-dependency-path: './frontend/yarn.lock'
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v0'
-
-      - name: 'Deploy frontend'
-        run: 'gcloud app deploy'
+      - name: Build
         working-directory: './frontend'
+        run: |
+          yarn
+          yarn build
 
-      - name: 'Test deployment'
-        run: 'curl https://cs3219-362509.et.r.appspot.com'
+      - name: Push into S3
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: frontend/dist
+          bucket: cs3219-g29-fe
+          bucket-region: ap-southeast-1
