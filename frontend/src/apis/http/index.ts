@@ -4,6 +4,7 @@ import UserApi from './user';
 import MatchingApi from './matching';
 import CollabApi from './collab';
 import { io } from 'socket.io-client';
+import ENV from '../../env';
 
 export class ApiService implements ApiServiceInterface {
   user = {
@@ -19,7 +20,7 @@ export class ApiService implements ApiServiceInterface {
     requestForMatch: MatchingApi.requestForMatch
   };
 
-  socket = io();
+  socket = io(ENV.SOCKET_URL);
 }
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
