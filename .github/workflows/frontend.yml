@@ -34,7 +34,7 @@ jobs:
 
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
+        working-directory: './frontend'
 
-      # Check deployment outcome
-      - id: 'test'
-        run: 'curl "${{ steps.deploy.outputs.url }}"'
+      - name: 'Test deployment'
+        run: 'curl https://cs3219-362509.et.r.appspot.com'
