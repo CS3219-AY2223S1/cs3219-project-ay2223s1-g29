@@ -18,5 +18,5 @@ network:
   session_affinity: true
 env_variables:
   # $ variables are expected to be replaced by environment variables
-  DB_URL: "mongodb+srv://cs3219dev:sWb2J7nntumjYcnz@cluster0.8aogma9.mongodb.net/cs3219dev?retryWrites=true&w=majority"
+  DB_URL: $DB_URL
 # [END gae_quickstart_yaml]
