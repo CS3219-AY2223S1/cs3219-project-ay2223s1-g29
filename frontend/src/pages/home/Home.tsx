@@ -103,12 +103,20 @@ export default function Home() {
       return;
     }
 
-    getRoom(token).then((res) => {
+    getRoom(token, username).then((res) => {
       if (isApiError(res)) {
         return;
       }
 
-      setRoom(res.data);
+      let altUser = res.data.userId1;
+      if (altUser === username) {
+        altUser = res.data.userId2;
+      }
+
+      setRoom({
+        ...res.data,
+        altUser,
+      });
 
       nextStep();
       new Promise(() => setTimeout(() => nextStep(), 300));

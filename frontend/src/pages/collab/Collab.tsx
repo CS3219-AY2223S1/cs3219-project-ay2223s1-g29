@@ -33,13 +33,13 @@ export default function Collab() {
   }, []);
 
   useEffect(() => {
-    if (!getRoomRes?.roomId || !getRoomRes?.altUser || getRoomRes?.question) {
+    if (!getRoomRes?._id || !getRoomRes?.altUser || getRoomRes?.question) {
       return;
     }
 
     socket.emit(EmitEvents.JOIN_ROOM, {
       token: token,
-      roomId: getRoomRes.roomId,
+      roomId: getRoomRes._id,
     });
   }, [state]);
 
