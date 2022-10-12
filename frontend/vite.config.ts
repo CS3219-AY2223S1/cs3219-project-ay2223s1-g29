@@ -9,5 +9,4 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  base: '/cs3219-g29-fe'
 });

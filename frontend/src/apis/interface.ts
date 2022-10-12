@@ -17,7 +17,7 @@ export interface ApiServiceInterface {
   },
   collab: {
     // TODO
-    getRoom: (token: string) => Promise<ApiResponse<GetRoomRes>>
+    getRoom: (token: string, username: string) => Promise<ApiResponse<GetRoomRes>>
   },
   matching: {
     requestForMatch: (token: string, d: MatchPostData) => Promise<ApiResponse<EmptyObj>>
