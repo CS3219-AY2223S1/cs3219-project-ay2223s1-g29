@@ -1,0 +1,36 @@
+name: frontend
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ./frontend/**/*
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          workload_identity_provider: 'projects/142948231110/locations/global/workloadIdentityPools/cs3219-g29-fe-pool/providers/cs3219-g29-fe-provider'
+          service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-appengine@v0'
+        with:
+          working_directory: './frontend'
+
+      # Check deployment outcoe
+      - id: 'test'
+        run: 'curl "${{ steps.deploy.outputs.url }}"'
