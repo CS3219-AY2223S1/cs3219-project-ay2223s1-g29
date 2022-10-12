@@ -40,3 +40,4 @@ jobs:
           folder: frontend/dist
           bucket: cs3219-g29-fe
           bucket-region: ap-southeast-1
+          dist-id: E2JDJSYJC8PSK8
