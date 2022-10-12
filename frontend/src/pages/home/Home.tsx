@@ -12,6 +12,7 @@ import { isApiError } from '../../apis/interface';
 import useInterval from '../../hooks/useInterval';
 import CollabSuccess from '../../components/collab/CollabSuccess';
 import { GetRoomRes } from '../../apis/types/collab.type';
+import CollabNavigate from '../collab/CollabNavigate';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -42,8 +43,11 @@ export default function Home() {
   });
 
   const reset = useCallback(() => {
-    resetStep();
+    setTimeLeft(0);
+    setDifficulty(undefined);
+    setRoom(undefined);
     setMsg('');
+    resetStep();
   }, [resetStep]);
 
   const onClickHandler = useCallback(
@@ -66,13 +70,32 @@ export default function Home() {
     [token],
   );
 
+  // on page load,
+  // check if this user is in any room
+  useEffect(() => {
+    getRoom(token, username).then((res) => {
+      if (isApiError(res)) {
+        // safely do nothing
+        return;
+      }
+
+      setRoom(res.data);
+      // this is linked to the conditional render
+      // by setting the room here,
+      // this will do the navigation directly
+    });
+  }, []);
+
   // set timeout to do polling
   useEffect(() => {
-    if (!difficulty) {
+    if (!difficulty || room) {
+      // do not start timeout
+      // component is in invalid 'state'
       return;
     }
 
     if (timeLeft < 0) {
+      // timed out - reset all states
       reset();
       setDifficulty(undefined);
       setRoom(undefined);
@@ -80,10 +103,7 @@ export default function Home() {
       return;
     }
 
-    if (room) {
-      return;
-    }
-
+    // timer in progress
     const timeout = setTimeout(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
@@ -95,11 +115,8 @@ export default function Home() {
 
   // code that does the actual api polling
   useInterval(() => {
-    if (!difficulty) {
-      return;
-    }
-
-    if (room) {
+    if (!difficulty || room) {
+      // do not run on page load
       return;
     }
 
@@ -121,7 +138,12 @@ export default function Home() {
       nextStep();
       new Promise(() => setTimeout(() => nextStep(), 300));
     });
-  }, 5000);
+  }, 1000);
+
+  if (room) {
+    // navigate to collab site if there is a room
+    return <CollabNavigate getRoomRes={room} />;
+  }
 
   return (
     <Center flexDirection="column" h="100vh">
