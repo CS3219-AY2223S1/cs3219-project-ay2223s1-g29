@@ -4,9 +4,12 @@ import { WebsocketProvider } from 'y-websocket';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
 import ENV from '../../env';
+import useIsMobile from '../../hooks/useIsMobile';
+import useWidth from '../../hooks/useWidth';
 
 export default function Editor() {
   const editorRef = useRef<any>(null);
+  const width = useWidth();
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -19,7 +22,7 @@ export default function Editor() {
 
     const editor = monaco.editor.create(editorRef.current, {
       value: '',
-      language: 'javascript',
+      language: 'python',
       theme: 'vs-dark',
     });
 
@@ -39,7 +42,7 @@ export default function Editor() {
       monacoBinding.destroy();
       editor.dispose();
     };
-  }, [editorRef.current]);
+  }, [editorRef.current, width]);
 
   return <div id="monaco-editor" ref={editorRef} style={{ width: '100%', height: '100%' }} />;
 }
