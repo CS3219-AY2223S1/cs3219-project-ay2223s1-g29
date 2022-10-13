@@ -21,7 +21,9 @@ export class ApiService implements ApiServiceInterface {
     requestForMatch: MatchingApi.requestForMatch
   };
 
-  socket = io(ENV.SOCKET_URL);
+  socket = io(ENV.SOCKET_URL, {
+    reconnectionAttempts: 10000
+  });
 }
 
 export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?: any) =>
