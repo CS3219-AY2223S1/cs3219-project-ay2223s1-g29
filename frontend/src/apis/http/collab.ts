@@ -1,6 +1,6 @@
 import { GetRoomRes } from './../types/collab.type';
 import { EmptyObj } from './../../utils.type';
-import { httpGet } from ".";
+import { httpDelete, httpGet } from ".";
 import ENV from "../../env";
 import { ApiResponse } from "../interface";
 import { getAuthHeader } from "../utils";
@@ -31,6 +31,12 @@ export default class CollabApi {
 
         return { data, err: null }
       })
+      .catch(err => ({ data: null, err }))
+  }
+
+  static async leaveRoom(token: string): Promise<ApiResponse<EmptyObj>> {
+    return httpDelete(BASE_URL, { ...getAuthHeader(token) })
+      .then(() => ({ data: {}, err: null }))
       .catch(err => ({ data: null, err }))
   }
 }

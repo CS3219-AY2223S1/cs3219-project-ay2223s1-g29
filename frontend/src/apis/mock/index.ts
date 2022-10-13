@@ -11,7 +11,8 @@ export class MockApiService implements ApiServiceInterface {
   };
 
   collab = {
-    getRoom: collab.getRoom
+    getRoom: collab.getRoom,
+    leaveRoom: collab.leaveRoom
   };
 
   matching = {

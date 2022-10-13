@@ -1,5 +1,6 @@
+import { Center, CircularProgress, Skeleton } from '@chakra-ui/react';
 import React from 'react';
 
 export default function SuspenseApp() {
-  return <div>SuspenseApp</div>;
+  return <Skeleton height="30vh" />;
 }

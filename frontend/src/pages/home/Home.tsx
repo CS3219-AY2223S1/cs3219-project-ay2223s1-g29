@@ -43,7 +43,7 @@ export default function Home() {
   });
 
   const reset = useCallback(() => {
-    setTimeLeft(0);
+    setTimeLeft(-1);
     setDifficulty(undefined);
     setRoom(undefined);
     setMsg('');
@@ -59,6 +59,7 @@ export default function Home() {
         difficulty: serializeDifficulty(selectedDifficulty),
       }).then((res) => {
         if (isApiError(res)) {
+          reset();
           setMsg('Please try again later.');
           return;
         }
@@ -122,6 +123,7 @@ export default function Home() {
 
     getRoom(token, username).then((res) => {
       if (isApiError(res)) {
+        // safely do nothing
         return;
       }
 

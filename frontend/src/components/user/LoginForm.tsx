@@ -14,7 +14,7 @@ export default function LoginForm() {
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>();
 
   const {
@@ -23,11 +23,14 @@ export default function LoginForm() {
 
   const { setAuth } = useOptionalAuth();
   const [loginErr, setLoginErr] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = useCallback((values: { username: string; password: string }) => {
+    setLoading(true);
     apiLogin(values)
       .then((res) => {
         if (isApiError(res)) {
+          setLoginErr(res.err.response.data.message);
           return;
         }
 
@@ -37,7 +40,7 @@ export default function LoginForm() {
         setAuth({ id, username }, token);
         window.location.reload();
       })
-      .catch((err) => setLoginErr(err.message));
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -74,7 +77,7 @@ export default function LoginForm() {
           </FormErrorMessage>
         </FormControl>
 
-        <Button mt={4} colorScheme="teal" isLoading={isSubmitting} type="submit">
+        <Button mt={4} colorScheme="teal" isLoading={loading} type="submit">
           Sign In
         </Button>
       </Flex>
