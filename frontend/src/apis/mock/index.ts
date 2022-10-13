@@ -19,5 +19,7 @@ export class MockApiService implements ApiServiceInterface {
     requestForMatch: matching.requestForMatch
   };
 
-  socket = io();
+  socket = io({
+    reconnectionAttempts: 1
+  });
 }
