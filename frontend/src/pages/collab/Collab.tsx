@@ -96,7 +96,7 @@ export default function Collab() {
           </Box>
         </Flex>
         <Flex flex={1}>
-          <Editor />
+          <Editor roomRes={getRoomRes} />
         </Flex>
       </Flex>
     </>
