@@ -60,11 +60,11 @@ export default function Collab() {
   const onLeaveRoom = useCallback(() => {
     leaveRoom(token).then((res) => {
       if (isApiError(res)) {
+        // safely do nothing
         return;
       }
-
-      navigate('/');
     });
+    navigate('/');
   }, []);
 
   if (!getRoomRes) {
