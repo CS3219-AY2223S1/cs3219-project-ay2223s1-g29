@@ -13,7 +13,8 @@ export class ApiService implements ApiServiceInterface {
   };
 
   collab = {
-    getRoom: CollabApi.getRoom
+    getRoom: CollabApi.getRoom,
+    leaveRoom: CollabApi.leaveRoom,
   };
 
   matching = {

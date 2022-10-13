@@ -59,6 +59,7 @@ export default function Home() {
         difficulty: serializeDifficulty(selectedDifficulty),
       }).then((res) => {
         if (isApiError(res)) {
+          reset();
           setMsg('Please try again later.');
           return;
         }
@@ -115,13 +116,15 @@ export default function Home() {
 
   // code that does the actual api polling
   useInterval(() => {
-    if (!difficulty || room) {
+    if (!difficulty || room || timeLeft === 0) {
       // do not run on page load
+      // or if timer hits 0
       return;
     }
 
     getRoom(token, username).then((res) => {
       if (isApiError(res)) {
+        // safely do nothing
         return;
       }
 

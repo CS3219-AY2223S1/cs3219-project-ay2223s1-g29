@@ -29,12 +29,23 @@ async function getRoom(token: string, username: string): Promise<ApiResponse<Get
   } else {
     return {
       data: null,
-      err: 'NOT_FOUND'
+      err: {
+        response: {
+          data: {
+            message: 'err'
+          }
+        }
+      }
     }
   }
 
 }
 
+async function leaveRoom(token: string): Promise<ApiResponse<EmptyObj>> {
+  return ({ data: {}, err: null })
+}
+
 export default {
-  getRoom
+  getRoom,
+  leaveRoom
 }
