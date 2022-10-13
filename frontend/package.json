@@ -28,7 +28,7 @@
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
     "y-monaco": "^0.1.4",
-    "y-websocket": "^1.4.5",
+    "y-webrtc": "^10.2.3",
     "yjs": "^13.5.41",
     "yup": "^0.32.11"
   },

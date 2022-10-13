@@ -1,15 +1,23 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
+import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
 import ENV from '../../env';
 import useIsMobile from '../../hooks/useIsMobile';
 import useWidth from '../../hooks/useWidth';
+import { GetRoomRes } from '../../apis/types/collab.type';
 
-export default function Editor() {
+type EditorProps = {
+  roomRes: GetRoomRes;
+};
+
+export default function Editor(props: EditorProps) {
   const editorRef = useRef<any>(null);
   const width = useWidth();
+  const {
+    roomRes: { _id: roomId },
+  } = props;
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -17,7 +25,12 @@ export default function Editor() {
     }
 
     const ydoc = new Y.Doc();
-    const provider = new WebsocketProvider(ENV.SOCKET_URL, 'monaco', ydoc);
+    // the typings for this library is wrong
+    // see the example on the docs
+    // @ts-ignore
+    const provider = new WebrtcProvider(`cs3219-g29-2022-${roomId}`, ydoc, {
+      password: roomId,
+    });
     const type = ydoc.getText('monaco');
 
     const editor = monaco.editor.create(editorRef.current, {
@@ -41,6 +54,7 @@ export default function Editor() {
     return () => {
       monacoBinding.destroy();
       editor.dispose();
+      provider.destroy();
     };
   }, [editorRef.current, width]);
 
