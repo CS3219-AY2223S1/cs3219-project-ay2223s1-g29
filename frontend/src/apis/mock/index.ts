@@ -7,7 +7,9 @@ import { io } from "socket.io-client";
 export class MockApiService implements ApiServiceInterface {
   user = {
     register: user.register,
-    login: user.login
+    login: user.login,
+    deleteAccount: user.deleteAccount,
+    resetPassword: user.resetPassword
   };
 
   collab = {

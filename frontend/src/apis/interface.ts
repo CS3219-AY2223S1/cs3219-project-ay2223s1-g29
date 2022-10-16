@@ -22,6 +22,8 @@ export interface ApiServiceInterface {
   user: {
     register: (d: RegisterPostData) => Promise<ApiResponse<RegisterResponse>>
     login: (d: LoginPostData) => Promise<ApiResponse<LoginResponse>>
+    deleteAccount: (token: string) => Promise<ApiResponse<EmptyObj>>
+    resetPassword: (token: string, password: string) => Promise<ApiResponse<EmptyObj>>
   },
   collab: {
     getRoom: (token: string, username: string) => Promise<ApiResponse<GetRoomRes>>
