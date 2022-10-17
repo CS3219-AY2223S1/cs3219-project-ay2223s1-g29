@@ -13,6 +13,7 @@ import useInterval from '../../hooks/useInterval';
 import CollabSuccess from '../../components/collab/CollabSuccess';
 import { GetRoomRes } from '../../apis/types/collab.type';
 import CollabNavigate from '../collab/CollabNavigate';
+import { useNavigate } from 'react-router-dom';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -21,8 +22,9 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const { username, token, userId } = useAuth();
+  const { username, token, userId, clearAuth } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const {
     matching: { requestForMatch },
@@ -70,6 +72,15 @@ export default function Home() {
     },
     [token],
   );
+
+  const onManageAccount = useCallback(() => {
+    navigate('/account');
+  }, []);
+
+  const onLogoutHandler = useCallback(() => {
+    clearAuth();
+    window.location.reload();
+  }, []);
 
   // on page load,
   // check if this user is in any room
@@ -150,7 +161,11 @@ export default function Home() {
 
   return (
     <Center flexDirection="column" h="100vh">
-      <UserHomeCard username={username} />
+      <UserHomeCard
+        username={username}
+        onLogout={onLogoutHandler}
+        onManageAccount={onManageAccount}
+      />
 
       <Center display="flex" flexDirection="column" mt={8} minWidth="50%">
         <Text fontSize="3xl">Start your interview preparation</Text>

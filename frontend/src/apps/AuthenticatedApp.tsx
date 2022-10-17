@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Account from '../pages/account/Account';
 import SuspenseApp from './SuspenseApp';
 
 const Home = lazy(() => import('../pages/home/Home'));
@@ -11,6 +12,7 @@ export default function AuthenticatedApp() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Home />} />
+          <Route path="/account" element={<Account />} />
           <Route path="/collab" element={<Collab />} />
 
           <Route path="*" element={<Navigate to="" />} />

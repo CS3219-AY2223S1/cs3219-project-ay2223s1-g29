@@ -9,7 +9,9 @@ import ENV from '../../env';
 export class ApiService implements ApiServiceInterface {
   user = {
     register: UserApi.register,
-    login: UserApi.login
+    login: UserApi.login,
+    deleteAccount: UserApi.deleteAccount,
+    resetPassword: UserApi.resetPassword
   };
 
   collab = {
@@ -37,6 +39,14 @@ export const httpGet = async (url: string, headers: AxiosRequestHeaders, params?
 export const httpPost = async (url: string, headers: AxiosRequestHeaders, data: any) =>
   axios({
     method: 'post',
+    url,
+    headers,
+    data,
+  });
+
+export const httpPatch = async (url: string, headers: AxiosRequestHeaders, data: any) =>
+  axios({
+    method: 'patch',
     url,
     headers,
     data,
