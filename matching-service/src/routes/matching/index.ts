@@ -28,7 +28,7 @@ export default(app: Router) => {
                     console.log("queue is not empty, there is a match");
                     if (MatchingService.peekQueue(difficulty)==userid) {
                         // edge case when the same user that is queuing request to match again 
-                        res.json({'status': 'user is already in the queue'}).status(409);
+                        res.json({'status': 'user is already in the queue'}).status(200);
                     } else {
                         const userId2:string = MatchingService.popQueue(difficulty);
                         // send the user and the matched user to collab service
