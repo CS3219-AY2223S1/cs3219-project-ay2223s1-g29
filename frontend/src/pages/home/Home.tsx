@@ -33,6 +33,7 @@ export default function Home() {
 
   const timeLeft = useRef<number>(0);
   const [timeLeftState, setTimeLeftState] = useState<number>(0);
+  const [numTries, setNumTries] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
   const [room, setRoom] = useState<GetRoomRes | undefined>();
   const [msg, setMsg] = useState<string>('');
@@ -67,8 +68,9 @@ export default function Home() {
         }
 
         nextStep();
-        timeLeft.current = 30;
-        setTimeLeftState(() => 30);
+        timeLeft.current = 60;
+        setTimeLeftState(() => 60);
+        setNumTries((prev) => prev + 1);
       });
     },
     [token],
@@ -101,18 +103,14 @@ export default function Home() {
 
   // code that does the actual api polling
   useInterval(() => {
-    if (timeLeft.current < 0) {
-      // timeout
-      reset();
-      setMsg('Could not find you a match in 60s.\nPlease try again later!');
-      return;
-    }
-
-    if (timeLeft.current === 0) {
-      // decrement one more time to enter
-      // the above if block
-      timeLeft.current -= 1;
-      return;
+    if (timeLeft.current <= 0) {
+      if (numTries > 0) {
+        reset();
+        setMsg('Could not find you a match in 60s.\nPlease try again later!');
+      } else {
+        // first load
+        return;
+      }
     }
 
     getRoom(token, username).then((res) => {
