@@ -34,6 +34,7 @@ export default function Collab() {
     });
 
     return () => {
+      socket.emit(EmitEvents.LEAVE_ROOM);
       socket.off(ListenEvents.RCV_MESSAGE);
     };
   }, []);
