@@ -62,7 +62,7 @@ export default function Home() {
       }).then((res) => {
         if (isApiError(res)) {
           reset();
-          setMsg('Please try again later.');
+          setMsg(res.err.response.data.message);
           return;
         }
 

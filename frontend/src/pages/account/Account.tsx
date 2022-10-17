@@ -49,19 +49,16 @@ export default function Account() {
     }
 
     setDeleteAccLoading(true);
-    deleteAccount(token)
-      .then((res) => {
-        if (isApiError(res)) {
-          setDeleteAccErr('Could not delete account.\nPlease try again later.');
-          return;
-        }
-
-        clearAuth();
-        window.location.reload();
-      })
-      .finally(() => {
+    deleteAccount(token).then((res) => {
+      if (isApiError(res)) {
         setDeleteAccLoading(false);
-      });
+        setDeleteAccErr(res.err.response.data.message);
+        return;
+      }
+
+      clearAuth();
+      window.location.reload();
+    });
   }, [token]);
 
   const onResetPwd = useCallback(
@@ -74,7 +71,7 @@ export default function Account() {
       resetPassword(token, d.password)
         .then((res) => {
           if (isApiError(res)) {
-            setResetPwdErr('Could not delete account.\nPlease try again later.');
+            setResetPwdErr(res.err.response.data.message);
             return;
           }
         })
@@ -159,7 +156,7 @@ export default function Account() {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               No
             </Button>
-            <Button variant="outline" onClick={onDeleteAccount}>
+            <Button variant="outline" onClick={onDeleteAccount} isLoading={deleteAccLoading}>
               Yes, I am sure
             </Button>
           </ModalFooter>

@@ -27,20 +27,19 @@ export default function LoginForm() {
 
   const onSubmit = useCallback((values: { username: string; password: string }) => {
     setLoading(true);
-    apiLogin(values)
-      .then((res) => {
-        if (isApiError(res)) {
-          setLoginErr(res.err.response.data.message);
-          return;
-        }
+    apiLogin(values).then((res) => {
+      if (isApiError(res)) {
+        setLoading(false);
+        setLoginErr(res.err.response.data.message);
+        return;
+      }
 
-        const {
-          data: { id, token, username },
-        } = res;
-        setAuth({ id, username }, token);
-        window.location.reload();
-      })
-      .finally(() => setLoading(false));
+      const {
+        data: { id, token, username },
+      } = res;
+      setAuth({ id, username }, token);
+      window.location.reload();
+    });
   }, []);
 
   return (
