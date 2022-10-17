@@ -1,5 +1,5 @@
 import { Box, Center, Flex, Grid, GridItem, Text } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import DifficultyButtons from '../../components/question/DifficultyButtons';
 import UserHomeCard from '../../components/user/UserHomeCard';
 import { useAuth } from '../../context/AuthContext';
@@ -31,7 +31,8 @@ export default function Home() {
     collab: { getRoom },
   } = useApiSvc();
 
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const timeLeft = useRef<number>(0);
+  const [timeLeftState, setTimeLeftState] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
   const [room, setRoom] = useState<GetRoomRes | undefined>();
   const [msg, setMsg] = useState<string>('');
@@ -45,7 +46,6 @@ export default function Home() {
   });
 
   const reset = useCallback(() => {
-    setTimeLeft(0);
     setDifficulty(undefined);
     setRoom(undefined);
     setMsg('');
@@ -62,12 +62,13 @@ export default function Home() {
       }).then((res) => {
         if (isApiError(res)) {
           reset();
-          setMsg('Please try again later.');
+          setMsg(res.err.response.data.message);
           return;
         }
 
         nextStep();
-        setTimeLeft(60);
+        timeLeft.current = 30;
+        setTimeLeftState(() => 30);
       });
     },
     [token],
@@ -91,51 +92,34 @@ export default function Home() {
         return;
       }
 
-      setRoom(res.data);
       // this is linked to the conditional render
       // by setting the room here,
       // this will do the navigation directly
+      setRoom(res.data);
     });
   }, []);
 
-  // set timeout to do polling
-  useEffect(() => {
-    if (!difficulty || room) {
-      // do not start timeout
-      // component is in invalid 'state'
-      return;
-    }
-
-    if (timeLeft < 0) {
-      // timed out - reset all states
-      reset();
-      setDifficulty(undefined);
-      setRoom(undefined);
-      setMsg('Could not find you a match.\nPlease try again later!');
-      return;
-    }
-
-    // timer in progress
-    const timeout = setTimeout(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(timeout);
-    };
-  }, [timeLeft, difficulty, room]);
-
   // code that does the actual api polling
   useInterval(() => {
-    if (!difficulty || room || timeLeft === 0) {
-      // do not run on page load
-      // or if timer hits 0
+    if (timeLeft.current < 0) {
+      // timeout
+      reset();
+      setMsg('Could not find you a match in 60s.\nPlease try again later!');
+      return;
+    }
+
+    if (timeLeft.current === 0) {
+      // decrement one more time to enter
+      // the above if block
+      timeLeft.current -= 1;
       return;
     }
 
     getRoom(token, username).then((res) => {
       if (isApiError(res)) {
         // safely do nothing
+        timeLeft.current -= 1;
+        setTimeLeftState((prev) => prev - 1);
         return;
       }
 
@@ -150,7 +134,7 @@ export default function Home() {
       });
 
       nextStep();
-      new Promise(() => setTimeout(() => nextStep(), 300));
+      new Promise(() => setTimeout(() => nextStep(), 100));
     });
   }, 1000);
 
@@ -183,7 +167,7 @@ export default function Home() {
             <Box alignSelf="center" width="250px">
               {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
               {activeStep === 1 && difficulty && (
-                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+                <MatchingIndicator value={timeLeftState} difficulty={difficulty} onAbort={reset} />
               )}
               {activeStep > 1 && difficulty && room && <CollabSuccess getRoomRes={room} />}
             </Box>
@@ -199,7 +183,7 @@ export default function Home() {
             <Box alignSelf="center" width="250px">
               {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
               {activeStep === 1 && difficulty && (
-                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+                <MatchingIndicator value={timeLeftState} difficulty={difficulty} onAbort={reset} />
               )}
               {activeStep > 1 && room && <CollabSuccess getRoomRes={room} />}
             </Box>
