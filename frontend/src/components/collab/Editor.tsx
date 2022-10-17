@@ -20,6 +20,7 @@ export default function Editor(props: EditorProps) {
   } = props;
 
   useEffect(() => {
+    console.log('reloading');
     if (!editorRef.current) {
       return;
     }
@@ -30,6 +31,7 @@ export default function Editor(props: EditorProps) {
     // @ts-ignore
     const provider = new WebrtcProvider(`cs3219-g29-2022-${roomId}`, ydoc, {
       password: roomId,
+      signaling: [ENV.YJS_SVC],
     });
     const type = ydoc.getText('monaco');
 
@@ -55,8 +57,9 @@ export default function Editor(props: EditorProps) {
       monacoBinding.destroy();
       editor.dispose();
       provider.destroy();
+      ydoc.destroy();
     };
-  }, [editorRef.current, width]);
+  }, [width]);
 
   return <div id="monaco-editor" ref={editorRef} style={{ width: '100%', height: '100%' }} />;
 }

@@ -1,0 +1,20 @@
+{
+	"name": "y-webrtc",
+	"version": "10.2.3",
+	"description": "WebRTC provider for Yjs",
+	"type": "module",
+	"dependencies": {
+		"lib0": "^0.2.42",
+		"simple-peer": "^9.11.0",
+		"y-protocols": "^1.0.5"
+	},
+	"peerDependenies": {
+    "yjs": "^13.5.6"
+  },
+  "optionalDependencies": {
+    "ws": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=12"
+  }
+}
