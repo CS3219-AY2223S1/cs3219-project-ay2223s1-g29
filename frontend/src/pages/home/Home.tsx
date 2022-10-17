@@ -107,6 +107,7 @@ export default function Home() {
       if (numTries > 0) {
         reset();
         setMsg('Could not find you a match in 60s.\nPlease try again later!');
+        return;
       } else {
         // first load
         return;
