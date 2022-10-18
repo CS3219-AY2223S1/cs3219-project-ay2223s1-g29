@@ -47,6 +47,7 @@ export default function ChatBox(props: ChatBoxProps) {
           conn.answer(stream);
           console.log(`answered call from ${props.altUser}`);
           callConn = conn;
+          setHasAltUserVid(true);
         });
 
         // call the other party
@@ -55,7 +56,6 @@ export default function ChatBox(props: ChatBoxProps) {
         call.on('stream', (remoteStream) => {
           console.log(`got ${props.altUser} stream`);
           altUserVid.current!.srcObject = remoteStream;
-          setHasAltUserVid(true);
         });
         call.on('error', (err) => {
           console.log({ err });
