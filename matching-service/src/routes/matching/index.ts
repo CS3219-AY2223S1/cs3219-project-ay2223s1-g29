@@ -3,6 +3,7 @@ import wrap from 'express-async-handler';
 import MatchingService from '../../services/matchingService';
 import CollabService from '../../services/collabService';
 import verifyToken from '../../middlewares/auth'
+import matchingService from '../../services/matchingService';
 
 const route = Router();
 
@@ -41,4 +42,21 @@ export default(app: Router) => {
             }
         }),
     );
+
+    // cancel matching
+    route.delete(
+        '/',
+        verifyToken,
+        wrap(async (req:Request, res:Response) => {
+            const {difficulty} = req.body;
+            const userid = req.params.username
+
+            if (MatchingService.peekQueue(difficulty)==userid) {
+                matchingService.popQueue(difficulty);
+                res.json({'status': 'removed user from queue'}).status(200);
+            } else {
+                res.json({'status': 'user does not exist in the queue'}).status(200);
+            }
+        })
+    )
 };
