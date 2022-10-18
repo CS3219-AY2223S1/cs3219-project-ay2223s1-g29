@@ -34,7 +34,6 @@ export default function Collab() {
     });
 
     return () => {
-      socket.emit(EmitEvents.LEAVE_ROOM);
       socket.off(ListenEvents.RCV_MESSAGE);
     };
   }, []);
@@ -48,15 +47,11 @@ export default function Collab() {
       token: token,
       roomId: getRoomRes._id,
     });
-  }, [state]);
 
-  const onSendChatMsg = useCallback(
-    (msg: string) => {
-      socket.emit(EmitEvents.SEND_MSG, msg);
-      setMessages((prev) => [...prev, { content: msg, from: username }]);
-    },
-    [username],
-  );
+    return () => {
+      socket.emit(EmitEvents.LEAVE_ROOM);
+    };
+  }, [state]);
 
   const onLeaveRoom = useCallback(() => {
     leaveRoom(token).then((res) => {

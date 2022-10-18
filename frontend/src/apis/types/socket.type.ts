@@ -1,7 +1,7 @@
 export const EmitEvents = {
   CONNECT: "connection",
   DISCONNECT: "disconnect",
-  JOIN_ROOM: "joinRoom",
+  JOIN_ROOM: "join-room",
   LEAVE_ROOM: "leaveRoom",
   SEND_MSG: "chatMessage"
 }

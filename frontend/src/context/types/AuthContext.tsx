@@ -1,3 +1,5 @@
+import Peer from 'peerjs';
+
 export type IOptionalAuthContext = {
   token: string | undefined;
   username: string | undefined;
@@ -10,6 +12,7 @@ export type IOptionalAuthContext = {
     token: string,
   ) => void;
   clearAuth: () => void;
+  peer: Peer | undefined;
 };
 
 export type IAuthContext = {
@@ -24,4 +27,5 @@ export type IAuthContext = {
     token: string,
   ) => void;
   clearAuth: () => void;
+  peer: Peer | undefined;
 };

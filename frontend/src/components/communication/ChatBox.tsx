@@ -1,18 +1,6 @@
-import {
-  AspectRatio,
-  Box,
-  Flex,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-} from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
+import { MediaConnection } from 'peerjs';
 import React, { useEffect, useRef, useState } from 'react';
-import { MediaConnection, Peer } from 'peerjs';
-import { useForm } from 'react-hook-form';
-import { ChatMsg } from '../../apis/types/socket.type';
-import { FiSend } from 'react-icons/fi';
-import ENV from '../../env';
 import { useAuth } from '../../context/AuthContext';
 import EmptyVideo from './EmptyVideo';
 
@@ -21,7 +9,7 @@ type ChatBoxProps = {
 };
 
 export default function ChatBox(props: ChatBoxProps) {
-  const { username } = useAuth();
+  const { peer } = useAuth();
 
   const [hasUserVid, setHasUserVid] = useState<boolean>(false);
   const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
@@ -30,74 +18,64 @@ export default function ChatBox(props: ChatBoxProps) {
   const altUserVid = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!props.altUser) {
+    if (!peer) {
       return;
     }
 
     let userStream: MediaStream | undefined;
-    let altUserConn: MediaConnection | undefined;
+    let callConn: MediaConnection | undefined;
 
-    if (username < props.altUser) {
-      // "smaller" user calls
-      navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: false,
-        })
-        .then((stream) => {
-          // set self
-          userStream = stream;
-          setHasUserVid(true);
-          userVid.current!.srcObject = stream;
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: true,
+      })
+      .then((stream) => {
+        console.log('got user stream');
+        userStream = stream;
+        setHasUserVid(true);
+        userVid.current!.srcObject = stream;
 
-          // call peer and then
-          // try and set other
-          const peer = new Peer(username);
-          const call = peer.call(props.altUser, stream);
-          altUserConn = call;
-          call.on('stream', (remoteStream) => {
-            altUserVid.current!.srcObject = remoteStream;
-            setHasAltUserVid(true);
-          });
-        })
-        .catch((err) => console.error(err));
-    } else {
-      // "larger" user answers
-      const peer = new Peer(username);
-      peer.on('call', (call) => {
-        altUserConn = call;
-        navigator.mediaDevices
-          .getUserMedia({
-            video: true,
-            audio: false,
-          })
-          .then((stream) => {
-            // set self
-            userStream = stream;
-            setHasUserVid(true);
-            userVid.current!.srcObject = stream;
+        peer.on('error', (err) => {
+          console.error(err);
+          console.error(err.stack);
+        });
 
-            // answer call
-            // try and set other
-            call.answer(stream);
-            call.on('stream', (remoteStream) => {
-              altUserVid.current!.srcObject = remoteStream;
-              setHasAltUserVid(true);
-            });
-          })
-          .catch((err) => console.error(err));
+        // always mount a call answerer first
+        peer.on('call', (conn) => {
+          console.log(`received call from ${props.altUser}`);
+          conn.answer(stream);
+          console.log(`answered call from ${props.altUser}`);
+          callConn = conn;
+        });
+
+        // call the other party
+        console.log(`calling ${props.altUser}...`);
+        const call = peer.call(props.altUser, stream);
+        call.on('stream', (remoteStream) => {
+          console.log(`got ${props.altUser} stream`);
+          altUserVid.current!.srcObject = remoteStream;
+          setHasAltUserVid(true);
+        });
+        call.on('error', (err) => {
+          console.log({ err });
+        });
       });
 
-      return () => {
-        userStream?.getTracks().forEach((track) => track.stop());
-        altUserConn?.close();
-      };
-    }
-  }, [props.altUser]);
+    return () => {
+      userStream?.getTracks().forEach((track) => track.stop());
+      // callConn?.close();
+    };
+  }, [peer]);
+
+  console.log({
+    hasUserVid,
+    hasAltUserVid,
+  });
 
   return (
     <Flex bg="gray.700" w="100%" h="100%" p={4} columnGap={2}>
-      {!userVid && <EmptyVideo />}
+      {!hasUserVid && <EmptyVideo />}
       <video
         ref={userVid}
         autoPlay
@@ -105,10 +83,12 @@ export default function ChatBox(props: ChatBoxProps) {
         controls={false}
         style={{
           display: !hasUserVid ? 'none' : 'block',
+          width: '100px',
+          height: '100px',
         }}
       />
 
-      {!altUserVid && <EmptyVideo />}
+      {!hasAltUserVid && <EmptyVideo />}
       <video
         ref={altUserVid}
         autoPlay
@@ -116,6 +96,8 @@ export default function ChatBox(props: ChatBoxProps) {
         controls={false}
         style={{
           display: !hasAltUserVid ? 'none' : 'block',
+          width: '100px',
+          height: '100px',
         }}
       />
     </Flex>
