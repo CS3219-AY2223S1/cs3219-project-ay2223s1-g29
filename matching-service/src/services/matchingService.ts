@@ -41,6 +41,20 @@ const popQueue = (difficulty:string):any => {
     }
 }
 
+const peekQueue = (difficulty:string):any => {
+    switch (difficulty) {
+        case "easy":
+            return easyQueue.peek();
+        case "medium":
+            return mediumQueue.peek();
+        case "hard":
+            return hardQueue.peek();
+        default:
+            console.log("random");
+            break;
+    }
+}
+
 const isEmpty = (difficulty:string) => {
     switch (difficulty) {
         case "easy":
@@ -62,6 +76,7 @@ const isEmpty = (difficulty:string) => {
 const MatchingService = {
     addQueue,
     popQueue,
+    peekQueue,
     isEmpty,
 };
 

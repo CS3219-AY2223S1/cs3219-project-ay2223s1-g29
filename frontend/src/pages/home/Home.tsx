@@ -1,5 +1,5 @@
 import { Box, Center, Flex, Grid, GridItem, Text } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import DifficultyButtons from '../../components/question/DifficultyButtons';
 import UserHomeCard from '../../components/user/UserHomeCard';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,10 @@ import useIsMobile from '../../hooks/useIsMobile';
 import { useApiSvc } from '../../context/ApiServiceContext';
 import { isApiError } from '../../apis/interface';
 import useInterval from '../../hooks/useInterval';
+import CollabSuccess from '../../components/collab/CollabSuccess';
+import { GetRoomRes } from '../../apis/types/collab.type';
+import CollabNavigate from '../collab/CollabNavigate';
+import { useNavigate } from 'react-router-dom';
 
 const STEPS = [
   { label: 'Select difficulty' },
@@ -18,16 +22,20 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const { username, token, userId } = useAuth();
+  const { username, token, userId, clearAuth } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const {
     matching: { requestForMatch },
     collab: { getRoom },
   } = useApiSvc();
 
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const timeLeft = useRef<number>(0);
+  const [timeLeftState, setTimeLeftState] = useState<number>(0);
+  const [numTries, setNumTries] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<DIFFICULTY | undefined>();
+  const [room, setRoom] = useState<GetRoomRes | undefined>();
   const [msg, setMsg] = useState<string>('');
 
   const {
@@ -39,8 +47,10 @@ export default function Home() {
   });
 
   const reset = useCallback(() => {
-    resetStep();
+    setDifficulty(undefined);
+    setRoom(undefined);
     setMsg('');
+    resetStep();
   }, [resetStep]);
 
   const onClickHandler = useCallback(
@@ -52,56 +62,93 @@ export default function Home() {
         difficulty: serializeDifficulty(selectedDifficulty),
       }).then((res) => {
         if (isApiError(res)) {
-          setMsg('Please try again later.');
+          reset();
+          setMsg(res.err.response.data.message);
           return;
         }
 
         nextStep();
-        setTimeLeft(60);
+        timeLeft.current = 60;
+        setTimeLeftState(() => 60);
+        setNumTries((prev) => prev + 1);
       });
     },
     [token],
   );
 
+  const onManageAccount = useCallback(() => {
+    navigate('/account');
+  }, []);
+
+  const onLogoutHandler = useCallback(() => {
+    clearAuth();
+    window.location.reload();
+  }, []);
+
+  // on page load,
+  // check if this user is in any room
   useEffect(() => {
-    if (!difficulty) {
-      return;
-    }
-
-    if (timeLeft < 0) {
-      reset();
-      setDifficulty(undefined);
-      setMsg('Could not find you a match.\nPlease try again later!');
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(timeout);
-    };
-  }, [timeLeft, difficulty]);
-
-  useInterval(() => {
-    if (!difficulty) {
-      return;
-    }
-
-    getRoom(token).then((res) => {
+    getRoom(token, username).then((res) => {
       if (isApiError(res)) {
+        // safely do nothing
         return;
       }
 
-      nextStep();
-      new Promise(() => setTimeout(() => nextStep(), 300));
+      // this is linked to the conditional render
+      // by setting the room here,
+      // this will do the navigation directly
+      setRoom(res.data);
     });
-  }, 5000);
+  }, []);
+
+  // code that does the actual api polling
+  useInterval(() => {
+    if (timeLeft.current <= 0) {
+      if (numTries > 0) {
+        reset();
+        setMsg('Could not find you a match in 60s.\nPlease try again later!');
+        return;
+      } else {
+        // first load
+        return;
+      }
+    }
+
+    getRoom(token, username).then((res) => {
+      if (isApiError(res)) {
+        // safely do nothing
+        timeLeft.current -= 1;
+        setTimeLeftState((prev) => prev - 1);
+        return;
+      }
+
+      let altUser = res.data.userId1;
+      if (altUser === username) {
+        altUser = res.data.userId2;
+      }
+
+      setRoom({
+        ...res.data,
+        altUser,
+      });
+
+      nextStep();
+      new Promise(() => setTimeout(() => nextStep(), 100));
+    });
+  }, 1000);
+
+  if (room) {
+    // navigate to collab site if there is a room
+    return <CollabNavigate getRoomRes={room} />;
+  }
 
   return (
     <Center flexDirection="column" h="100vh">
-      <UserHomeCard username={username} />
+      <UserHomeCard
+        username={username}
+        onLogout={onLogoutHandler}
+        onManageAccount={onManageAccount}
+      />
 
       <Center display="flex" flexDirection="column" mt={8} minWidth="50%">
         <Text fontSize="3xl">Start your interview preparation</Text>
@@ -119,8 +166,9 @@ export default function Home() {
             <Box alignSelf="center" width="250px">
               {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
               {activeStep === 1 && difficulty && (
-                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+                <MatchingIndicator value={timeLeftState} difficulty={difficulty} onAbort={reset} />
               )}
+              {activeStep > 1 && difficulty && room && <CollabSuccess getRoomRes={room} />}
             </Box>
           </>
         )}
@@ -128,14 +176,15 @@ export default function Home() {
         {isMobile && (
           <Flex direction="column" align="center" justify="center">
             <Text fontSize="1xl" mb={2}>
-              {STEPS[activeStep].label}
+              {STEPS[activeStep]?.label ?? ''}
             </Text>
 
             <Box alignSelf="center" width="250px">
               {activeStep === 0 && <DifficultyButtons onClick={onClickHandler} msg={msg} />}
               {activeStep === 1 && difficulty && (
-                <MatchingIndicator value={timeLeft} difficulty={difficulty} onAbort={reset} />
+                <MatchingIndicator value={timeLeftState} difficulty={difficulty} onAbort={reset} />
               )}
+              {activeStep > 1 && room && <CollabSuccess getRoomRes={room} />}
             </Box>
           </Flex>
         )}
