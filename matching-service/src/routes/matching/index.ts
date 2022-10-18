@@ -37,7 +37,7 @@ export default(app: Router) => {
                     }
                 }
             } else {
-                res.status(400).send({'error': 'bad request: missing parameters'});
+                res.status(200).send({'error': 'bad request: missing parameters'});
             }
         }),
     );
