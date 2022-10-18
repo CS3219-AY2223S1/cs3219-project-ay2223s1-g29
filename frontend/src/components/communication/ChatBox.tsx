@@ -1,60 +1,123 @@
 import {
+  AspectRatio,
   Box,
   Flex,
   IconButton,
   Input,
   InputGroup,
-  InputRightAddon,
   InputRightElement,
 } from '@chakra-ui/react';
-import React, { SyntheticEvent, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { MediaConnection, Peer } from 'peerjs';
 import { useForm } from 'react-hook-form';
 import { ChatMsg } from '../../apis/types/socket.type';
 import { FiSend } from 'react-icons/fi';
+import ENV from '../../env';
+import { useAuth } from '../../context/AuthContext';
+import EmptyVideo from './EmptyVideo';
 
 type ChatBoxProps = {
-  messages: ChatMsg[];
-  onSend: (msg: string) => void;
-};
-
-type ChatFormValues = {
-  msg: string;
+  altUser: string;
 };
 
 export default function ChatBox(props: ChatBoxProps) {
-  const { handleSubmit, register, reset } = useForm<ChatFormValues>();
+  const { username } = useAuth();
 
-  const onSubmit = (values: ChatFormValues) => {
-    if (!values.msg) {
+  const [hasUserVid, setHasUserVid] = useState<boolean>(false);
+  const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
+
+  const userVid = useRef<HTMLVideoElement>(null);
+  const altUserVid = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!props.altUser) {
       return;
     }
 
-    props.onSend(values.msg);
-    reset();
-  };
+    let userStream: MediaStream | undefined;
+    let altUserConn: MediaConnection | undefined;
+
+    if (username < props.altUser) {
+      // "smaller" user calls
+      navigator.mediaDevices
+        .getUserMedia({
+          video: true,
+          audio: false,
+        })
+        .then((stream) => {
+          // set self
+          userStream = stream;
+          setHasUserVid(true);
+          userVid.current!.srcObject = stream;
+
+          // call peer and then
+          // try and set other
+          const peer = new Peer(username);
+          const call = peer.call(props.altUser, stream);
+          altUserConn = call;
+          call.on('stream', (remoteStream) => {
+            altUserVid.current!.srcObject = remoteStream;
+            setHasAltUserVid(true);
+          });
+        })
+        .catch((err) => console.error(err));
+    } else {
+      // "larger" user answers
+      const peer = new Peer(username);
+      peer.on('call', (call) => {
+        altUserConn = call;
+        navigator.mediaDevices
+          .getUserMedia({
+            video: true,
+            audio: false,
+          })
+          .then((stream) => {
+            // set self
+            userStream = stream;
+            setHasUserVid(true);
+            userVid.current!.srcObject = stream;
+
+            // answer call
+            // try and set other
+            call.answer(stream);
+            call.on('stream', (remoteStream) => {
+              altUserVid.current!.srcObject = remoteStream;
+              setHasAltUserVid(true);
+            });
+          })
+          .catch((err) => console.error(err));
+      });
+
+      return () => {
+        userStream?.getTracks().forEach((track) => track.stop());
+        altUserConn?.close();
+      };
+    }
+  }, [props.altUser]);
 
   return (
-    <Box bg="gray.700" w="100%" h="100%" p={4}>
-      <Flex h="70%" direction="column">
-        {props.messages.length === 0 && <div>You have no messages</div>}
-        {props.messages.length > 0 &&
-          props.messages.map((msg, idx) => (
-            <Box key={`${idx}-${msg}`}>
-              {msg.from}: {msg.content}
-            </Box>
-          ))}
-      </Flex>
+    <Flex bg="gray.700" w="100%" h="100%" p={4} columnGap={2}>
+      {!userVid && <EmptyVideo />}
+      <video
+        ref={userVid}
+        autoPlay
+        playsInline
+        controls={false}
+        style={{
+          display: !hasUserVid ? 'none' : 'block',
+        }}
+      />
 
-      <Box h="30%">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <InputGroup>
-            <Input id="msg" placeholder="Message" {...register('msg')} />
-            <InputRightElement>
-              <IconButton type="submit" colorScheme="blue" aria-label="Send" icon={<FiSend />} />
-            </InputRightElement>
-          </InputGroup>
-        </form>
-      </Box>
-    </Box>
+      {!altUserVid && <EmptyVideo />}
+      <video
+        ref={altUserVid}
+        autoPlay
+        playsInline
+        controls={false}
+        style={{
+          display: !hasAltUserVid ? 'none' : 'block',
+        }}
+      />
+    </Flex>
   );
 }

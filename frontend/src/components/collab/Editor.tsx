@@ -20,7 +20,6 @@ export default function Editor(props: EditorProps) {
   } = props;
 
   useEffect(() => {
-    console.log('reloading');
     if (!editorRef.current) {
       return;
     }

@@ -93,7 +93,7 @@ export default function Collab() {
             <QuestionBox question={getRoomRes.question} />
           </Box>
           <Box flexBasis="24%" h="100%" w="100%">
-            <ChatBox messages={messages} onSend={onSendChatMsg} />
+            <ChatBox altUser={getRoomRes.altUser} />
           </Box>
         </Flex>
         <Flex flex={1}>
