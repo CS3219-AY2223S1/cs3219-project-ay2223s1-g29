@@ -47,15 +47,11 @@ export default function Collab() {
       token: token,
       roomId: getRoomRes._id,
     });
-  }, [state]);
 
-  const onSendChatMsg = useCallback(
-    (msg: string) => {
-      socket.emit(EmitEvents.SEND_MSG, msg);
-      setMessages((prev) => [...prev, { content: msg, from: username }]);
-    },
-    [username],
-  );
+    return () => {
+      socket.emit(EmitEvents.LEAVE_ROOM);
+    };
+  }, [state]);
 
   const onLeaveRoom = useCallback(() => {
     leaveRoom(token).then((res) => {
@@ -92,7 +88,7 @@ export default function Collab() {
             <QuestionBox question={getRoomRes.question} />
           </Box>
           <Box flexBasis="24%" h="100%" w="100%">
-            <ChatBox messages={messages} onSend={onSendChatMsg} />
+            <ChatBox altUser={getRoomRes.altUser} />
           </Box>
         </Flex>
         <Flex flex={1}>

@@ -42,6 +42,7 @@ export const httpPost = async (url: string, headers: AxiosRequestHeaders, data: 
     url,
     headers,
     data,
+    // timeout: 2000
   });
 
 export const httpPatch = async (url: string, headers: AxiosRequestHeaders, data: any) =>

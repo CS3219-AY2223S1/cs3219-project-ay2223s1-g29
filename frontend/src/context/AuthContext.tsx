@@ -1,9 +1,11 @@
+import Peer from 'peerjs';
 import React, {
   createContext,
   ReactNode,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { useCookies } from 'react-cookie';
@@ -26,6 +28,8 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
       return token;
     }
   });
+
+  const [peer, setPeer] = useState<Peer | undefined>();
 
   useEffect(() => {
     if (!token) {
@@ -63,8 +67,24 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
     removeCookie('cs3219-prpr-t');
   }, []);
 
+  useEffect(() => {
+    if (!username) {
+      return;
+    }
+
+    setPeer(new Peer(username));
+    return () => {
+      if (peer) {
+        peer.destroy();
+      }
+    };
+  }, [username]);
+
   return (
-    <AuthContext.Provider value={{ username, token, userId, setAuth, clearAuth }} {...props} />
+    <AuthContext.Provider
+      value={{ username, token, userId, setAuth, clearAuth, peer }}
+      {...props}
+    />
   );
 };
 

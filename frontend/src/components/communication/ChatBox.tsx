@@ -1,60 +1,105 @@
-import {
-  Box,
-  Flex,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightAddon,
-  InputRightElement,
-} from '@chakra-ui/react';
-import React, { SyntheticEvent, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { ChatMsg } from '../../apis/types/socket.type';
-import { FiSend } from 'react-icons/fi';
+import { Flex } from '@chakra-ui/react';
+import { MediaConnection } from 'peerjs';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import EmptyVideo from './EmptyVideo';
 
 type ChatBoxProps = {
-  messages: ChatMsg[];
-  onSend: (msg: string) => void;
-};
-
-type ChatFormValues = {
-  msg: string;
+  altUser: string;
 };
 
 export default function ChatBox(props: ChatBoxProps) {
-  const { handleSubmit, register, reset } = useForm<ChatFormValues>();
+  const { peer } = useAuth();
 
-  const onSubmit = (values: ChatFormValues) => {
-    if (!values.msg) {
+  const [hasUserVid, setHasUserVid] = useState<boolean>(false);
+  const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
+
+  const userVid = useRef<HTMLVideoElement>(null);
+  const altUserVid = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!peer) {
       return;
     }
 
-    props.onSend(values.msg);
-    reset();
-  };
+    let userStream: MediaStream | undefined;
+    let callConn: MediaConnection | undefined;
+
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: true,
+      })
+      .then((stream) => {
+        console.log('got user stream');
+        userStream = stream;
+        setHasUserVid(true);
+        userVid.current!.srcObject = stream;
+
+        peer.on('error', (err) => {
+          console.error(err);
+          console.error(err.stack);
+        });
+
+        // always mount a call answerer first
+        peer.on('call', (conn) => {
+          console.log(`received call from ${props.altUser}`);
+          conn.answer(stream);
+          console.log(`answered call from ${props.altUser}`);
+          callConn = conn;
+        });
+
+        // call the other party
+        console.log(`calling ${props.altUser}...`);
+        const call = peer.call(props.altUser, stream);
+        call.on('stream', (remoteStream) => {
+          console.log(`got ${props.altUser} stream`);
+          altUserVid.current!.srcObject = remoteStream;
+          setHasAltUserVid(true);
+        });
+        call.on('error', (err) => {
+          console.log({ err });
+        });
+      });
+
+    return () => {
+      userStream?.getTracks().forEach((track) => track.stop());
+      // callConn?.close();
+    };
+  }, [peer]);
+
+  console.log({
+    hasUserVid,
+    hasAltUserVid,
+  });
 
   return (
-    <Box bg="gray.700" w="100%" h="100%" p={4}>
-      <Flex h="70%" direction="column">
-        {props.messages.length === 0 && <div>You have no messages</div>}
-        {props.messages.length > 0 &&
-          props.messages.map((msg, idx) => (
-            <Box key={`${idx}-${msg}`}>
-              {msg.from}: {msg.content}
-            </Box>
-          ))}
-      </Flex>
+    <Flex bg="gray.700" w="100%" h="100%" p={4} columnGap={2}>
+      {!hasUserVid && <EmptyVideo />}
+      <video
+        ref={userVid}
+        autoPlay
+        playsInline
+        controls={false}
+        style={{
+          display: !hasUserVid ? 'none' : 'block',
+          width: '100px',
+          height: '100px',
+        }}
+      />
 
-      <Box h="30%">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <InputGroup>
-            <Input id="msg" placeholder="Message" {...register('msg')} />
-            <InputRightElement>
-              <IconButton type="submit" colorScheme="blue" aria-label="Send" icon={<FiSend />} />
-            </InputRightElement>
-          </InputGroup>
-        </form>
-      </Box>
-    </Box>
+      {!hasAltUserVid && <EmptyVideo />}
+      <video
+        ref={altUserVid}
+        autoPlay
+        playsInline
+        controls={false}
+        style={{
+          display: !hasAltUserVid ? 'none' : 'block',
+          width: '100px',
+          height: '100px',
+        }}
+      />
+    </Flex>
   );
 }

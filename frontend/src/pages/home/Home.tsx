@@ -114,11 +114,11 @@ export default function Home() {
       }
     }
 
+    timeLeft.current -= 1;
+    setTimeLeftState((prev) => prev - 1);
     getRoom(token, username).then((res) => {
       if (isApiError(res)) {
         // safely do nothing
-        timeLeft.current -= 1;
-        setTimeLeftState((prev) => prev - 1);
         return;
       }
 
