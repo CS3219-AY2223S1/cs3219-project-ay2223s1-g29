@@ -72,7 +72,16 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
       return;
     }
 
-    setPeer(new Peer(username));
+    const peer = new Peer(username, {
+      debug: 3,
+    });
+    peer.on('error', (err) => {
+      console.error(err);
+      console.error(err.stack);
+    });
+
+    setPeer(peer);
+
     return () => {
       if (peer) {
         peer.destroy();

@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/react';
 import { MediaConnection } from 'peerjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import EmptyVideo from './EmptyVideo';
 
@@ -13,58 +13,73 @@ export default function ChatBox(props: ChatBoxProps) {
 
   const [hasUserVid, setHasUserVid] = useState<boolean>(false);
   const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
+  const [isAltUserActive, setIsAltUserActive] = useState<boolean>(false);
 
   const userVid = useRef<HTMLVideoElement>(null);
   const altUserVid = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!peer) {
       return;
     }
 
     let userStream: MediaStream | undefined;
-    let callConn: MediaConnection | undefined;
+    let altUserCall: MediaConnection | undefined;
 
-    navigator.mediaDevices
-      .getUserMedia({
+    const fn = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        console.log('got user stream');
-        userStream = stream;
-        setHasUserVid(true);
-        userVid.current!.srcObject = stream;
-
-        peer.on('error', (err) => {
-          console.error(err);
-          console.error(err.stack);
-        });
-
-        // always mount a call answerer first
-        peer.on('call', (conn) => {
-          console.log(`received call from ${props.altUser}`);
-          conn.answer(stream);
-          console.log(`answered call from ${props.altUser}`);
-          callConn = conn;
-          setHasAltUserVid(true);
-        });
-
-        // call the other party
-        console.log(`calling ${props.altUser}...`);
-        const call = peer.call(props.altUser, stream);
-        call.on('stream', (remoteStream) => {
-          console.log(`got ${props.altUser} stream`);
-          altUserVid.current!.srcObject = remoteStream;
-        });
-        call.on('error', (err) => {
-          console.log({ err });
-        });
+        audio: false,
       });
 
+      if (!stream) {
+        return;
+      }
+
+      console.log('Comm: got user stream');
+      userStream = stream;
+      setHasUserVid(true);
+      userVid.current!.srcObject = userStream;
+
+      console.log('Comm: set call event listener (answer any incoming calls)');
+      peer.on('call', (conn) => {
+        console.log(`Comm: received call from ${props.altUser}`);
+        conn.answer(userStream);
+        console.log(`Comm: answered call from ${props.altUser}`);
+      });
+
+      console.log(`Comm: calling ${props.altUser}...`);
+      const call = peer.call(props.altUser, userStream);
+      altUserCall = call;
+      altUserCall.on('stream', (remoteStream) => {
+        setHasAltUserVid(true);
+
+        if (!remoteStream.active) {
+          return;
+        }
+        console.log(`got ${props.altUser} stream`);
+        setIsAltUserActive(true);
+        altUserVid.current!.srcObject = remoteStream;
+      });
+      altUserCall.on('error', (err) => {
+        console.log({ err });
+      });
+    };
+
+    fn();
+
     return () => {
-      userStream?.getTracks().forEach((track) => track.stop());
-      // callConn?.close();
+      if (!userStream || !altUserCall) {
+        console.log({
+          userStream,
+          altUserCall,
+        });
+        return;
+      }
+
+      // teardown
+      userStream.getTracks().forEach((track) => track.stop());
+      altUserCall.emit('close');
     };
   }, [peer]);
 
@@ -88,14 +103,14 @@ export default function ChatBox(props: ChatBoxProps) {
         }}
       />
 
-      {!hasAltUserVid && <EmptyVideo />}
+      {(!hasAltUserVid || !isAltUserActive) && <EmptyVideo user={props.altUser} />}
       <video
         ref={altUserVid}
         autoPlay
         playsInline
         controls={false}
         style={{
-          display: !hasAltUserVid ? 'none' : 'block',
+          display: !hasAltUserVid && !isAltUserActive ? 'none' : 'block',
           width: '100px',
           height: '100px',
         }}
