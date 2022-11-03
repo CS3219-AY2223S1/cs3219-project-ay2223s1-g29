@@ -150,9 +150,9 @@ export default function Home() {
         onManageAccount={onManageAccount}
       />
 
-      <Center display="flex" flexDirection="column" mt={8} minWidth="50%">
-        <Text fontSize="3xl">Start your interview preparation</Text>
-      </Center>
+      <Text fontSize="3xl" textAlign="center" mt={8}>
+        Start your interview preparation
+      </Text>
 
       <Center minWidth="50%" px="10%">
         {!isMobile && (
@@ -175,7 +175,7 @@ export default function Home() {
 
         {isMobile && (
           <Flex direction="column" align="center" justify="center">
-            <Text fontSize="1xl" mb={2}>
+            <Text fontSize="1xl" mt={4} mb={2}>
               {STEPS[activeStep]?.label ?? ''}
             </Text>
 
