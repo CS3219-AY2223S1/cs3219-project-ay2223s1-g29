@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
-import ENV from '../../env';
-import useIsMobile from '../../hooks/useIsMobile';
 import useWidth from '../../hooks/useWidth';
 import { GetRoomRes } from '../../apis/types/collab.type';
+import Waiting from './Waiting';
 
 type EditorProps = {
   roomRes: GetRoomRes;
+  isAllJoined: boolean;
 };
 
 export default function Editor(props: EditorProps) {
@@ -19,8 +19,12 @@ export default function Editor(props: EditorProps) {
     roomRes: { _id: roomId },
   } = props;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editorRef.current) {
+      return;
+    }
+
+    if (!props.isAllJoined) {
       return;
     }
 
@@ -30,7 +34,6 @@ export default function Editor(props: EditorProps) {
     // @ts-ignore
     const provider = new WebrtcProvider(`cs3219-g29-2022-${roomId}`, ydoc, {
       password: roomId,
-      signaling: [ENV.YJS_SVC],
     });
     const type = ydoc.getText('monaco');
 
@@ -58,7 +61,16 @@ export default function Editor(props: EditorProps) {
       provider.destroy();
       ydoc.destroy();
     };
-  }, [width]);
+  }, [width, props.isAllJoined]);
 
-  return <div id="monaco-editor" ref={editorRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <>
+      {!props.isAllJoined && <Waiting />}
+      <div
+        id="monaco-editor"
+        ref={editorRef}
+        style={{ display: !props.isAllJoined ? 'none' : 'block', width: '100%', height: '100%' }}
+      />
+    </>
+  );
 }

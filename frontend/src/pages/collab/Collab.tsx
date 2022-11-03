@@ -26,17 +26,7 @@ export default function Collab() {
     socket,
   } = useApiSvc();
 
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
-
-  useEffect(() => {
-    socket.on(ListenEvents.RCV_MESSAGE, (msg: string) => {
-      setMessages((prev) => [...prev, { content: msg, from: getRoomRes?.altUser ?? '' }]);
-    });
-
-    return () => {
-      socket.off(ListenEvents.RCV_MESSAGE);
-    };
-  }, []);
+  const [isAllJoined, setIsAllJoined] = useState<boolean>(false);
 
   useEffect(() => {
     if (!getRoomRes?._id || !getRoomRes?.altUser || getRoomRes?.question) {
@@ -52,6 +42,20 @@ export default function Collab() {
       socket.emit(EmitEvents.LEAVE_ROOM);
     };
   }, [state]);
+
+  useEffect(() => {
+    socket.on(ListenEvents.USER_JOIN, (peeps: string[]) => {
+      if (peeps.length !== 2) {
+        setIsAllJoined(false);
+      } else {
+        setIsAllJoined(true);
+      }
+    });
+
+    return () => {
+      socket.off(ListenEvents.USER_JOIN);
+    };
+  }, []);
 
   const onLeaveRoom = useCallback(() => {
     leaveRoom(token).then((res) => {
@@ -88,11 +92,11 @@ export default function Collab() {
             <QuestionBox question={getRoomRes.question} />
           </Box>
           <Box flexBasis="24%" h="100%" w="100%">
-            <ChatBox altUser={getRoomRes.altUser} />
+            <ChatBox isAllJoined={isAllJoined} altUser={getRoomRes.altUser} />
           </Box>
         </Flex>
         <Flex flex={1}>
-          <Editor roomRes={getRoomRes} />
+          <Editor isAllJoined={isAllJoined} roomRes={getRoomRes} />
         </Flex>
       </Flex>
     </>

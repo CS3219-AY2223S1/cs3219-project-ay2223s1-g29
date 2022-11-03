@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -67,7 +68,7 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
     removeCookie('cs3219-prpr-t');
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!username) {
       return;
     }
