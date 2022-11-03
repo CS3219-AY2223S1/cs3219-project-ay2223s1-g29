@@ -6,6 +6,7 @@ import EmptyVideo from './EmptyVideo';
 
 type ChatBoxProps = {
   altUser: string;
+  isAllJoined: boolean;
 };
 
 export default function ChatBox(props: ChatBoxProps) {
@@ -13,13 +14,18 @@ export default function ChatBox(props: ChatBoxProps) {
 
   const [hasUserVid, setHasUserVid] = useState<boolean>(false);
   const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
-  const [isAltUserActive, setIsAltUserActive] = useState<boolean>(false);
 
   const userVid = useRef<HTMLVideoElement>(null);
   const altUserVid = useRef<HTMLVideoElement>(null);
 
   useLayoutEffect(() => {
     if (!peer) {
+      // no peer - quit
+      return;
+    }
+
+    if (!props.isAllJoined) {
+      // not all have joined the room
       return;
     }
 
@@ -54,15 +60,11 @@ export default function ChatBox(props: ChatBoxProps) {
       altUserCall.on('stream', (remoteStream) => {
         setHasAltUserVid(true);
 
-        if (!remoteStream.active) {
-          return;
-        }
-        console.log(`got ${props.altUser} stream`);
-        setIsAltUserActive(true);
+        console.log(`Comm: got ${props.altUser} stream`);
         altUserVid.current!.srcObject = remoteStream;
       });
       altUserCall.on('error', (err) => {
-        console.log({ err });
+        console.log('Comm: altUser err: ', err);
       });
     };
 
@@ -70,10 +72,6 @@ export default function ChatBox(props: ChatBoxProps) {
 
     return () => {
       if (!userStream || !altUserCall) {
-        console.log({
-          userStream,
-          altUserCall,
-        });
         return;
       }
 
@@ -81,36 +79,33 @@ export default function ChatBox(props: ChatBoxProps) {
       userStream.getTracks().forEach((track) => track.stop());
       altUserCall.emit('close');
     };
-  }, [peer]);
+  }, [peer, props.isAllJoined]);
 
-  console.log({
-    hasUserVid,
-    hasAltUserVid,
-  });
+  const notSetupYet = !props.isAllJoined || !hasUserVid || !hasAltUserVid;
 
   return (
     <Flex bg="gray.700" w="100%" h="100%" p={4} columnGap={2}>
-      {!hasUserVid && <EmptyVideo />}
+      {notSetupYet && <EmptyVideo />}
       <video
         ref={userVid}
         autoPlay
         playsInline
         controls={false}
         style={{
-          display: !hasUserVid ? 'none' : 'block',
+          display: notSetupYet ? 'none' : 'block',
           width: '100px',
           height: '100px',
         }}
       />
 
-      {(!hasAltUserVid || !isAltUserActive) && <EmptyVideo user={props.altUser} />}
+      {notSetupYet && <EmptyVideo />}
       <video
         ref={altUserVid}
         autoPlay
         playsInline
         controls={false}
         style={{
-          display: !hasAltUserVid && !isAltUserActive ? 'none' : 'block',
+          display: notSetupYet ? 'none' : 'block',
           width: '100px',
           height: '100px',
         }}
