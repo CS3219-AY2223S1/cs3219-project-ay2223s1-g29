@@ -29,17 +29,14 @@ export default function Collab() {
   const [isAllJoined, setIsAllJoined] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!getRoomRes?._id || !getRoomRes?.altUser || getRoomRes?.question) {
+    if (!getRoomRes?._id || !getRoomRes?.altUser || !getRoomRes?.question) {
       return;
     }
 
-    socket.emit(EmitEvents.JOIN_ROOM, {
-      token: token,
-      roomId: getRoomRes._id,
-    });
+    socket.emit(EmitEvents.JOIN_ROOM, getRoomRes._id);
 
     return () => {
-      socket.emit(EmitEvents.LEAVE_ROOM);
+      socket.emit(EmitEvents.LEAVE_ROOM, getRoomRes._id);
     };
   }, [state]);
 
