@@ -11,3 +11,4 @@ dist
 
 # Ignore the scratch directory (used to private testing)
 local/
+.DS_Store
