@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useRef } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 import { ApiService } from '../apis/http';
 import { ApiServiceInterface } from '../apis/interface';
 import { MockApiService } from '../apis/mock';
@@ -17,6 +17,16 @@ const ApiServiceContext = createContext<ApiServiceInterface | null>(null);
 
 const ApiServiceContextProvider = (props: { svcType?: ServiceType; children: ReactNode }) => {
   const apiService = getApiService(props.svcType ?? 'real');
+
+  useEffect(() => {
+    return () => {
+      if (!apiService.socket) {
+        return;
+      }
+
+      apiService.socket.disconnect();
+    };
+  }, []);
 
   return <ApiServiceContext.Provider value={apiService} children={props.children} />;
 };

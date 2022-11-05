@@ -24,6 +24,8 @@ export class ApiService implements ApiServiceInterface {
   };
 
   socket = io(ENV.SOCKET_URL, {
+    transports: ['websocket'],
+    upgrade: false,
     reconnectionAttempts: 10000
   });
 }
