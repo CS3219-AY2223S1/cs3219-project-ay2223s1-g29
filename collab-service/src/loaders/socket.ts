@@ -9,13 +9,18 @@ export default async (server) => {
       origin: '*',
       methods: ['GET', 'POST'],
     },
+    transports: ['websocket'],
   });
 
   const defaultValue = '';
 
   io.on('connection', (socket) => {
     socket.on('join-room', async (roomId) => {
-      socket.join(roomId);
+      	console.log('joined room');
+	socket.join(roomId);
+	const clients = io.sockets.adapter.rooms.get(roomId);
+	console.log(clients);
+	socket.in(roomId).emit('user-join',[...clients]);
     });
 
     socket.on('get-document', async (documentId) => {
