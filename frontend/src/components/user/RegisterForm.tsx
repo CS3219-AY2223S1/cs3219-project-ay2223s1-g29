@@ -15,7 +15,7 @@ export default function RegisterForm() {
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     getValues,
   } = useForm<RegisterFormValues>();
 
@@ -25,10 +25,14 @@ export default function RegisterForm() {
 
   const { setAuth } = useOptionalAuth();
   const [registerErr, setRegisterErr] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = useCallback((values: RegisterFormValues) => {
+    setIsLoading(true);
     apiRegister(values).then((res) => {
       if (isApiError(res)) {
+        setIsLoading(false);
+        setRegisterErr(res.err.response.data.message);
         return;
       }
 
@@ -98,7 +102,7 @@ export default function RegisterForm() {
           </FormErrorMessage>
         </FormControl>
 
-        <Button mt={4} colorScheme="teal" isLoading={isSubmitting} type="submit">
+        <Button mt={4} colorScheme="teal" isLoading={isLoading} type="submit">
           Create Account
         </Button>
       </Flex>

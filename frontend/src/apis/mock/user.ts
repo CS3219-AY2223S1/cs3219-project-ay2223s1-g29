@@ -1,3 +1,4 @@
+import { EmptyObj } from './../../utils.type';
 import { LoginPostData, LoginResponse, RegisterPostData, RegisterResponse } from "../types/user.type";
 import { ApiResponse } from "../interface";
 
@@ -23,7 +24,23 @@ async function login(d: LoginPostData): Promise<ApiResponse<LoginResponse>> {
   }
 }
 
+async function deleteAccount(): Promise<ApiResponse<EmptyObj>> {
+  return {
+    data: {},
+    err: null
+  }
+}
+
+async function resetPassword(_password: string): Promise<ApiResponse<EmptyObj>> {
+  return {
+    data: {},
+    err: null
+  }
+}
+
 export default {
   register,
-  login
+  login,
+  deleteAccount,
+  resetPassword
 }

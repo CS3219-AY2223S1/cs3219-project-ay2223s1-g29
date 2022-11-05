@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
 import config from './config';
+import { Exception } from './exceptions';
 
 const main =async () => {
   const app = express.default();
@@ -16,6 +17,17 @@ const main =async () => {
   app.use('/api', routes);
 
   app.get('/', (req, res) => res.send('Hello World with Express'));
+
+  // catch 404 and forward to error handler
+  app.use((req, res, next) => {
+    const error: Exception = new Exception('Not Found', 404);
+    next(error);
+  });
+
+  // Default error handler
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({ message: err.message });
+  });
 
   app.listen(config.port, () => {
     console.log("Listening on port " + config.port);
