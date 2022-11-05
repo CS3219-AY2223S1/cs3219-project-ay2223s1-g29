@@ -23,7 +23,7 @@ export default function TextEditor() {
   const [quill, setQuill] = useState()
 
   useEffect(() => {
-    const s = io.connect("http://cs3219-collab-service-dot-cs3219-361208.as.r.appspot.com/")
+    const s = io.connect("https://collab.schoolex.me", {transports: ['websocket'], upgrade: false})
     setSocket(s)
 
     return () => {
@@ -60,10 +60,13 @@ export default function TextEditor() {
     if (socket == null || quill == null) return
 
     const handler = delta => {
+      console.log(delta)
       quill.updateContents(delta)
     }
     socket.on("receive-changes", handler)
-
+    socket.on("user-join", (clients) => {
+      console.log(clients)
+    })
     return () => {
       socket.off("receive-changes", handler)
     }
