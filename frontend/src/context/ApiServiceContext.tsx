@@ -19,6 +19,7 @@ const ApiServiceContextProvider = (props: { svcType?: ServiceType; children: Rea
   const apiService = getApiService(props.svcType ?? 'real');
 
   useEffect(() => {
+    apiService.socket.connect();
     return () => {
       if (!apiService.socket) {
         return;

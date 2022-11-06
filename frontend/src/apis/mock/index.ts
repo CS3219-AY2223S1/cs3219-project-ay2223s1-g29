@@ -22,6 +22,7 @@ export class MockApiService implements ApiServiceInterface {
   };
 
   socket = io({
-    reconnectionAttempts: 1
+    reconnectionAttempts: 1,
+    autoConnect: false
   });
 }
