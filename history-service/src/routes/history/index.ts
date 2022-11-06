@@ -1,8 +1,6 @@
 import { Request, Response, Router} from 'express';
 import wrap from 'express-async-handler';
 import HistoryService from '../../services/historyService';
-import verifyToken from '../../middlewares/auth'
-import { logger } from '../../loggers/logger';
 
 const route = Router();
 
