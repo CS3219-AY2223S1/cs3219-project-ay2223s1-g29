@@ -33,7 +33,13 @@ export default function Collab() {
       return;
     }
 
-    socket.emit(EmitEvents.JOIN_ROOM, getRoomRes._id);
+    socket.emit(EmitEvents.JOIN_ROOM, getRoomRes._id, (peeps: string[]) => {
+      if (peeps.length !== 2) {
+        setIsAllJoined(false);
+      } else {
+        setIsAllJoined(true);
+      }
+    });
 
     return () => {
       socket.emit(EmitEvents.LEAVE_ROOM, getRoomRes._id);
