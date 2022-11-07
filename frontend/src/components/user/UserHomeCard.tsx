@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useCallback } from 'react';
 import { FaHandsHelping, FaUser } from 'react-icons/fa';
+import { BiDotsVerticalRounded } from 'react-icons/bi';
 import { useAuth } from '../../context/AuthContext';
 
 type UserHomeCardProps = {
@@ -36,28 +37,25 @@ export default function UserHomeCard(props: UserHomeCardProps) {
         {username}.
       </Text>
 
-      {props.onManageAccount && (
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          size="sm"
-          type="button"
-          onClick={props.onManageAccount}
-        >
-          Manage Account
-        </Button>
-      )}
+      {props.onManageAccount && props.onLogout && (
+        <ButtonGroup colorScheme="teal" size="sm" isAttached variant="outline">
+          <Button type="button" w="100%" onClick={() => alert('Coming soon!')}>
+            View My History
+          </Button>
 
-      {props.onLogout && (
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          size="sm"
-          type="button"
-          onClick={props.onLogout}
-        >
-          Logout
-        </Button>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label="More actions"
+              icon={<BiDotsVerticalRounded />}
+              variant="outline"
+            />
+            <MenuList>
+              <MenuItem onClick={props.onManageAccount}>Manage Account</MenuItem>
+              <MenuItem onClick={props.onLogout}>Logout</MenuItem>
+            </MenuList>
+          </Menu>
+        </ButtonGroup>
       )}
     </Flex>
   );
