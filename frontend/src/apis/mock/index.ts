@@ -1,6 +1,7 @@
-import { ApiServiceInterface } from "../interface";
+import { ApiResponse, ApiServiceInterface } from "../interface";
 import user from './user'
 import matching from './matching'
+import history from './history'
 import collab from './collab'
 import { io } from "socket.io-client";
 
@@ -19,6 +20,10 @@ export class MockApiService implements ApiServiceInterface {
 
   matching = {
     requestForMatch: matching.requestForMatch
+  };
+
+  history = {
+    getHistory: history.getHistory
   };
 
   socket = io({

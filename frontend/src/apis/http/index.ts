@@ -1,12 +1,14 @@
-import { ApiServiceInterface } from './../interface';
+import { ApiResponse, ApiServiceInterface } from './../interface';
 import axios, { AxiosRequestHeaders } from 'axios';
 import UserApi from './user';
 import MatchingApi from './matching';
 import CollabApi from './collab';
 import { io } from 'socket.io-client';
 import ENV from '../../env';
+import HistoryApi from './history';
 
 export class ApiService implements ApiServiceInterface {
+
   user = {
     register: UserApi.register,
     login: UserApi.login,
@@ -21,6 +23,10 @@ export class ApiService implements ApiServiceInterface {
 
   matching = {
     requestForMatch: MatchingApi.requestForMatch
+  };
+
+  history = {
+    getHistory: HistoryApi.getHistory
   };
 
   socket = io(ENV.SOCKET_URL, {

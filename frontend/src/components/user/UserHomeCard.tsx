@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   ButtonGroup,
   Flex,
@@ -14,7 +13,7 @@ import {
 import React, { useCallback } from 'react';
 import { FaHandsHelping, FaUser } from 'react-icons/fa';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
-import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 type UserHomeCardProps = {
   username: string;
@@ -24,6 +23,11 @@ type UserHomeCardProps = {
 
 export default function UserHomeCard(props: UserHomeCardProps) {
   const { username } = props;
+  const navigate = useNavigate();
+
+  const onViewHistory = useCallback(() => {
+    navigate('/history');
+  }, []);
 
   return (
     <Flex direction="column" rowGap={2}>
@@ -39,8 +43,8 @@ export default function UserHomeCard(props: UserHomeCardProps) {
 
       {props.onManageAccount && props.onLogout && (
         <ButtonGroup colorScheme="teal" size="sm" isAttached variant="outline">
-          <Button type="button" w="100%" onClick={() => alert('Coming soon!')}>
-            View My History
+          <Button type="button" w="100%" onClick={onViewHistory}>
+            View My Statistics
           </Button>
 
           <Menu>
