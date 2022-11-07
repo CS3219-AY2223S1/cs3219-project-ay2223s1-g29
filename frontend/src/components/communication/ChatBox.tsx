@@ -65,6 +65,7 @@ export default function ChatBox(props: ChatBoxProps) {
         altUserVid.current!.srcObject = remoteStream;
       });
       altUserCall.on('error', (err) => {
+        alert('Comm: altUser err: ' + err);
         console.log('Comm: altUser err: ', err);
       });
     };
@@ -78,7 +79,7 @@ export default function ChatBox(props: ChatBoxProps) {
 
       // teardown
       userStream.getTracks().forEach((track) => track.stop());
-      // altUserCall.emit('close');
+      altUserCall.emit('close');
     };
   }, [peer, props.isAllJoined]);
 
