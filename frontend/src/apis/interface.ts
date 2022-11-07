@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io-client';
 import { EmptyObj } from './../utils.type';
 import { GetRoomRes } from './types/collab.type';
+import { HistoryGetData } from './types/history.type';
 import { MatchPostData } from './types/matching.type';
 import { LoginPostData, LoginResponse } from './types/user.type';
 import { RegisterPostData, RegisterResponse } from "./types/user.type"
@@ -32,6 +33,9 @@ export interface ApiServiceInterface {
   matching: {
     requestForMatch: (token: string, d: MatchPostData) => Promise<ApiResponse<EmptyObj>>
   },
+  history: {
+    getHistory: (token: string, username: string) => Promise<ApiResponse<HistoryGetData>>
+  }
 
   socket: Socket
 }

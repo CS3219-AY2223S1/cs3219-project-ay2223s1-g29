@@ -5,6 +5,7 @@ import SuspenseApp from './SuspenseApp';
 
 const Home = lazy(() => import('../pages/home/Home'));
 const Collab = lazy(() => import('../pages/collab/Collab'));
+const History = lazy(() => import('../pages/history/History'));
 
 export default function AuthenticatedApp() {
   return (
@@ -12,6 +13,7 @@ export default function AuthenticatedApp() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Home />} />
+          <Route path="/history" element={<History />} />
           <Route path="/account" element={<Account />} />
           <Route path="/collab" element={<Collab />} />
 
