@@ -86,7 +86,7 @@ export default function History() {
         setErr('');
       }
     });
-  });
+  }, []);
 
   if (!username) {
     return null;
