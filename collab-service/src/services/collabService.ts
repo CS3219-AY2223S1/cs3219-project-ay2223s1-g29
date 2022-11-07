@@ -6,7 +6,7 @@ import config from '../config';
 
 const getQuestion = async (difficulty:string) => {
   const res = await axios.get(config.questionsServiceUrl + `/${difficulty}`);
-  return res.data.question;
+  return res.data;
 };
 
 const createMatch = async (userId1: string, userId2: string, difficulty: string) => {
@@ -18,11 +18,13 @@ const createMatch = async (userId1: string, userId2: string, difficulty: string)
     throw new Exception(`Room already exists for user ${userId1} or ${userId2}`, 409);
   }
   try {
+    const question = await getQuestion(difficulty);
     const newRoom = RoomRepo.createRoom({
       userId1,
       userId2,
       difficulty,
-      question: await getQuestion(difficulty),
+      question: question.question,
+      questionId: question._id,
       endTime: new Date(Date.now() + TIME_OUT_IN_MS),
     });
     return newRoom;
