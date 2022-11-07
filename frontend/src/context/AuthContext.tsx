@@ -75,6 +75,7 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
 
     const peer = new Peer(username, {
       debug: 3,
+      secure: false,
     });
     peer.on('error', (err) => {
       console.error(err);
