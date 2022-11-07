@@ -32,7 +32,9 @@ export default (app: Router) => {
     verifyToken,
     wrap(async (req: Request, res: Response) => {
       const updatedRoom = await CollabService.updateRoomEndTime(req.params.username);
-      res.json({ updatedRoom }).status(200);
+      setTimeout(() => {
+	res.json({ updatedRoom }).status(200);
+    }, 1000);
     })
   );
 };
