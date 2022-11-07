@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
@@ -19,7 +19,7 @@ export default function Editor(props: EditorProps) {
     roomRes: { _id: roomId },
   } = props;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!editorRef.current) {
       return;
     }
@@ -61,7 +61,7 @@ export default function Editor(props: EditorProps) {
       provider.destroy();
       ydoc.destroy();
     };
-  }, [width, props.isAllJoined]);
+  }, [width, props]);
 
   return (
     <>

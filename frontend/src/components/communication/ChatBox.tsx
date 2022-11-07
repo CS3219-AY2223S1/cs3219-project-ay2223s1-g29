@@ -1,49 +1,48 @@
 import { Flex } from '@chakra-ui/react';
 import { MediaConnection } from 'peerjs';
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { GetRoomRes } from '../../apis/types/collab.type';
 import { useAuth } from '../../context/AuthContext';
 import EmptyVideo from './EmptyVideo';
 
 type ChatBoxProps = {
-  altUser: string;
-  isAllJoined: boolean;
+  getRoomRes?: GetRoomRes;
   roomSocks: string[];
+  isAllJoined: boolean;
 };
 
 export default function ChatBox(props: ChatBoxProps) {
-  const { peer } = useAuth();
+  const { getRoomRes, roomSocks, isAllJoined } = props;
+  const { username, peer } = useAuth();
 
-  const [hasUserVid, setHasUserVid] = useState<boolean>(false);
-  const [hasAltUserVid, setHasAltUserVid] = useState<boolean>(false);
-
+  const [userMedia, setUserMedia] = useState<MediaStream | undefined>();
   const userVid = useRef<HTMLVideoElement>(null);
   const altUserVid = useRef<HTMLVideoElement>(null);
 
-  const [userMedia, setUserMedia] = useState<MediaStream | undefined>();
-
-  // get the user video and set listeners
+  // get the user video
   useEffect(() => {
-    if (!userVid.current || !peer) {
+    if (!userVid.current) {
       return;
     }
 
+    if (userMedia) {
+      // if userMedia is already present
+      // setup the destructor
+      return () => {
+        userMedia.getTracks().forEach((track) => track.stop());
+      };
+    }
+
+    // if not present
+    // request for access and use
     navigator.mediaDevices
       .getUserMedia({
         video: true,
         audio: false,
       })
       .then((stream) => {
-        setHasUserVid(true);
         setUserMedia(stream);
         userVid.current!.srcObject = stream;
-
-        console.log('Comm: set call event listener (answer any incoming calls)');
-        peer.on('call', (conn) => {
-          console.log(`Comm: received call from ${props.altUser}`);
-          conn.answer(stream);
-          console.log(`Comm: answered call from ${props.altUser}`);
-        });
       })
       .catch((err) => {
         alert(
@@ -53,73 +52,100 @@ export default function ChatBox(props: ChatBoxProps) {
             err,
         );
       });
+  }, [userMedia]);
 
-    return () => {
-      if (!userMedia) {
-        return;
-      }
-
-      userMedia.getTracks().forEach((track) => track.stop());
-    };
-  }, [peer]);
-
+  // when we receive userMedia
+  // mount answer-er onto peer
   useEffect(() => {
-    let altUserCall: MediaConnection | undefined;
+    let userCall: MediaConnection | undefined;
 
     if (!peer || !userMedia) {
       return;
     }
 
-    (async () => {
-      console.log(`Comm: calling ${props.altUser}...`);
-      const call = peer.call(props.altUser, userMedia);
-      altUserCall = call;
-      altUserCall.on('stream', (remoteStream) => {
-        setHasAltUserVid(true);
+    peer.on('call', (conn) => {
+      conn.answer(userMedia);
 
-        console.log(`Comm: got ${props.altUser} stream`);
+      userCall = conn;
+      userCall.on('stream', (stream) => {
+        // get caller's stream
+        altUserVid.current!.srcObject = stream;
+      });
+    });
+    peer.on('error', (err) => {
+      alert('We have an error: ' + err);
+    });
+
+    return () => {
+      if (userCall) {
+        userCall.off('stream');
+        userCall.close();
+      }
+
+      peer.off('call');
+      peer.off('error');
+    };
+  }, [peer, userMedia]);
+
+  // whenever sockets change
+  // the smaller user calls the larger one
+  useEffect(() => {
+    let altUserCall: MediaConnection | undefined;
+
+    if (!peer || !userMedia || !getRoomRes) {
+      return;
+    }
+
+    if (roomSocks.length !== 2) {
+      return;
+    }
+
+    if (username < getRoomRes.altUser) {
+      // perform the call
+      const call = peer.call(`cs3219-call-${getRoomRes.altUser}`, userMedia);
+      altUserCall = call;
+
+      // get callee's stream
+      altUserCall.on('stream', (remoteStream) => {
         altUserVid.current!.srcObject = remoteStream;
       });
       altUserCall.on('error', (err) => {
-        alert('Comm: altUser err: ' + err);
-        console.log('Comm: altUser err: ', err);
+        alert('The other user sent an error: ' + err);
       });
-    })();
+    }
 
     return () => {
-      if (!altUserCall) {
-        return;
+      if (altUserCall) {
+        altUserCall.off('stream');
+        altUserCall.off('error');
+        altUserCall.close();
       }
-
-      altUserCall.emit('close');
     };
-  }, [peer, props, userMedia]);
-
-  const notSetupYet = !props.isAllJoined || !hasUserVid || !hasAltUserVid;
+  }, [peer, roomSocks, userMedia]);
 
   return (
     <Flex bg="gray.700" w="100%" h="100%" p={4} columnGap={2}>
-      {notSetupYet && <EmptyVideo />}
+      {!isAllJoined && <EmptyVideo />}
       <video
         ref={userVid}
         autoPlay
         playsInline
         controls={false}
         style={{
-          display: notSetupYet ? 'none' : 'block',
+          display: !isAllJoined ? 'none' : 'block',
           width: '100px',
           height: '100px',
         }}
       />
 
-      {notSetupYet && <EmptyVideo />}
+      {!isAllJoined && <EmptyVideo />}
       <video
         ref={altUserVid}
         autoPlay
         playsInline
         controls={false}
         style={{
-          display: notSetupYet ? 'none' : 'block',
+          display: !isAllJoined ? 'none' : 'block',
           width: '100px',
           height: '100px',
         }}

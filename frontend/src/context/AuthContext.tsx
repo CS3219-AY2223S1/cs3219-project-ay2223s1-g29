@@ -73,7 +73,7 @@ const AuthContextProvider = (props: { children: ReactNode }) => {
       return;
     }
 
-    const peer = new Peer(username, {
+    const peer = new Peer(`cs3219-call-${username}`, {
       debug: 3,
     });
     peer.on('error', (err) => {

@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useApiSvc } from '../../context/ApiServiceContext';
-import { ChatMsg, EmitEvents, ListenEvents } from '../../apis/types/socket.type';
+import { EmitEvents, ListenEvents } from '../../apis/types/socket.type';
 import { useAuth } from '../../context/AuthContext';
-import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react';
-import ChatBox from '../../components/communication/ChatBox';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import QuestionBox from '../../components/question/QuestionBox';
 import { GetRoomRes } from '../../apis/types/collab.type';
 import Editor from '../../components/collab/Editor';
-import { FaHandsHelping, FaUserAlt } from 'react-icons/fa';
+import { FaHandsHelping } from 'react-icons/fa';
 import { isApiError } from '../../apis/interface';
+import ChatBox from '../../components/communication/ChatBox';
 
 type LocationState = {
   getRoomRes?: GetRoomRes;
@@ -98,7 +98,7 @@ export default function Collab() {
             <QuestionBox question={getRoomRes.question} />
           </Box>
           <Box flexBasis="24%" h="100%" w="100%">
-            <ChatBox roomSocks={roomSocks} isAllJoined={isAllJoined} altUser={getRoomRes.altUser} />
+            <ChatBox isAllJoined={isAllJoined} roomSocks={roomSocks} getRoomRes={getRoomRes} />
           </Box>
         </Flex>
         <Flex flex={1}>
