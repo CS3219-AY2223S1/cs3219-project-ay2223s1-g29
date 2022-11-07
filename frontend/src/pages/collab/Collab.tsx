@@ -104,12 +104,16 @@ export default function Collab() {
   // when we receive userMedia
   // mount answer-er onto peer
   useEffect(() => {
+    let userCall: MediaConnection | undefined;
+
     if (!peer || !userMedia) {
       return;
     }
 
     peer.on('call', (conn) => {
       conn.answer(userMedia);
+
+      userCall = conn;
       conn.on('stream', (stream) => {
         // get caller's stream
         altUserVid.current!.srcObject = stream;
@@ -121,6 +125,13 @@ export default function Collab() {
 
     return () => {
       peer.off('call');
+
+      if (!userCall) {
+        return;
+      }
+
+      userCall.emit('close');
+      userCall.off('stream');
     };
   }, [peer, userMedia]);
 
