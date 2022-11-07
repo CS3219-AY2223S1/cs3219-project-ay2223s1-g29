@@ -1,12 +1,14 @@
 import { Flex } from '@chakra-ui/react';
 import { MediaConnection } from 'peerjs';
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import EmptyVideo from './EmptyVideo';
 
 type ChatBoxProps = {
   altUser: string;
   isAllJoined: boolean;
+  roomSocks: string[];
 };
 
 export default function ChatBox(props: ChatBoxProps) {
@@ -18,45 +20,59 @@ export default function ChatBox(props: ChatBoxProps) {
   const userVid = useRef<HTMLVideoElement>(null);
   const altUserVid = useRef<HTMLVideoElement>(null);
 
-  useLayoutEffect(() => {
-    if (!peer) {
-      // no peer - quit
+  const [userMedia, setUserMedia] = useState<MediaStream | undefined>();
+
+  // get the user video and set listeners
+  useEffect(() => {
+    if (!userVid.current || !peer) {
       return;
     }
 
-    if (!props.isAllJoined) {
-      // not all have joined the room
-      return;
-    }
-
-    let userStream: MediaStream | undefined;
-    let altUserCall: MediaConnection | undefined;
-
-    const fn = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({
+    navigator.mediaDevices
+      .getUserMedia({
         video: true,
         audio: false,
+      })
+      .then((stream) => {
+        setHasUserVid(true);
+        setUserMedia(stream);
+        userVid.current!.srcObject = stream;
+
+        console.log('Comm: set call event listener (answer any incoming calls)');
+        peer.on('call', (conn) => {
+          console.log(`Comm: received call from ${props.altUser}`);
+          conn.answer(stream);
+          console.log(`Comm: answered call from ${props.altUser}`);
+        });
+      })
+      .catch((err) => {
+        alert(
+          'Camera and audio access is required.\n' +
+            'Please refresh the page and allow access.\n' +
+            'Error: ' +
+            err,
+        );
       });
 
-      if (!stream) {
-        alert('Comm: could not get user stream');
+    return () => {
+      if (!userMedia) {
         return;
       }
 
-      console.log('Comm: got user stream');
-      userStream = stream;
-      setHasUserVid(true);
-      userVid.current!.srcObject = userStream;
+      userMedia.getTracks().forEach((track) => track.stop());
+    };
+  }, [peer]);
 
-      console.log('Comm: set call event listener (answer any incoming calls)');
-      peer.on('call', (conn) => {
-        console.log(`Comm: received call from ${props.altUser}`);
-        conn.answer(userStream);
-        console.log(`Comm: answered call from ${props.altUser}`);
-      });
+  useEffect(() => {
+    let altUserCall: MediaConnection | undefined;
 
+    if (!peer || !userMedia) {
+      return;
+    }
+
+    (async () => {
       console.log(`Comm: calling ${props.altUser}...`);
-      const call = peer.call(props.altUser, userStream);
+      const call = peer.call(props.altUser, userMedia);
       altUserCall = call;
       altUserCall.on('stream', (remoteStream) => {
         setHasAltUserVid(true);
@@ -68,20 +84,16 @@ export default function ChatBox(props: ChatBoxProps) {
         alert('Comm: altUser err: ' + err);
         console.log('Comm: altUser err: ', err);
       });
-    };
-
-    fn();
+    })();
 
     return () => {
-      if (!userStream || !altUserCall) {
+      if (!altUserCall) {
         return;
       }
 
-      // teardown
-      userStream.getTracks().forEach((track) => track.stop());
       altUserCall.emit('close');
     };
-  }, [peer, props.isAllJoined]);
+  }, [peer, props, userMedia]);
 
   const notSetupYet = !props.isAllJoined || !hasUserVid || !hasAltUserVid;
 

@@ -27,6 +27,7 @@ export default function Collab() {
   } = useApiSvc();
 
   const [isAllJoined, setIsAllJoined] = useState<boolean>(false);
+  const [roomSocks, setRoomSocks] = useState<string[]>([]);
 
   useEffect(() => {
     if (!getRoomRes?._id || !getRoomRes?.altUser || !getRoomRes?.question) {
@@ -34,6 +35,7 @@ export default function Collab() {
     }
 
     socket.emit(EmitEvents.JOIN_ROOM, getRoomRes._id, (peeps: string[]) => {
+      setRoomSocks(peeps);
       if (peeps.length !== 2) {
         setIsAllJoined(false);
       } else {
@@ -48,6 +50,7 @@ export default function Collab() {
 
   useEffect(() => {
     socket.on(ListenEvents.USER_JOIN, (peeps: string[]) => {
+      setRoomSocks(peeps);
       if (peeps.length !== 2) {
         setIsAllJoined(false);
       } else {
@@ -95,7 +98,7 @@ export default function Collab() {
             <QuestionBox question={getRoomRes.question} />
           </Box>
           <Box flexBasis="24%" h="100%" w="100%">
-            <ChatBox isAllJoined={isAllJoined} altUser={getRoomRes.altUser} />
+            <ChatBox roomSocks={roomSocks} isAllJoined={isAllJoined} altUser={getRoomRes.altUser} />
           </Box>
         </Flex>
         <Flex flex={1}>
