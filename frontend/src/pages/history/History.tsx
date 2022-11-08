@@ -20,7 +20,6 @@ import { useOptionalAuth } from '../../context/AuthContext';
 import { Link as RouterLink } from 'react-router-dom';
 import { useApiSvc } from '../../context/ApiServiceContext';
 import { isApiError } from '../../apis/interface';
-import { stat } from 'fs';
 
 type StatModel = {
   easyCnt: number;
@@ -69,9 +68,6 @@ export default function History() {
             break;
           case 'hard':
             statModel.hardCnt += 1;
-            break;
-          case 'random':
-            statModel.randomCnt += 1;
             break;
           default:
             statModel.easyCnt += 1;
@@ -137,15 +133,11 @@ export default function History() {
                 <Td>Hard</Td>
                 <Td isNumeric>{stats.hardCnt}</Td>
               </Tr>
-              <Tr>
-                <Td>Random</Td>
-                <Td isNumeric>{stats.randomCnt}</Td>
-              </Tr>
             </Tbody>
             <Tfoot>
               <Tr>
                 <Td>Total</Td>
-                <Td isNumeric>{stats.easyCnt + stats.medCnt + stats.hardCnt + stats.randomCnt}</Td>
+                <Td isNumeric>{stats.easyCnt + stats.medCnt + stats.hardCnt}</Td>
               </Tr>
             </Tfoot>
           </Table>
