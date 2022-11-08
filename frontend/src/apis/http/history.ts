@@ -8,7 +8,7 @@ const BASE_URL = ENV.HISTORY_API
 
 export default class HistoryApi {
   static async getHistory(token: string, username: string): Promise<ApiResponse<HistoryGetData>> {
-    return httpGet(`${BASE_URL}?userId=${username}`, {
+    return httpGet(`${BASE_URL}?userId1=${username}`, {
       ...getAuthHeader(token)
     }, {})
       .then(res => ({ data: res.data, err: null }))
