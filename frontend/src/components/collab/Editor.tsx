@@ -34,6 +34,7 @@ export default function Editor(props: EditorProps) {
     // @ts-ignore
     const provider = new WebrtcProvider(`cs3219-g29-2022-${roomId}`, ydoc, {
       password: roomId,
+      signaling: ['wss://collab.schoolex.me/ws'],
     });
     const type = ydoc.getText('monaco');
 
