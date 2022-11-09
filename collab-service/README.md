@@ -45,8 +45,10 @@ Inspired by Bulletproof Node.js architecture with modificatins
 ### SSH into GCE
 `gcloud compute ssh instance-1`
 
-### Enable websockets in GAE
-gcloud compute firewall-rules create default-allow-websockets     --allow tcp:65080     --target-tags websocket     --description "Allow websocket traffic on port 65080"
+#### Useful commands
+`pm2 start "npm run dev"`
+`pm2 logs`
+`pm2 stop all`
 
 <br>
 <br>
@@ -146,12 +148,3 @@ per-line.
 11. The units of information that make up conventional commits MUST NOT be treated as case sensitive by implementors, with the exception of BREAKING CHANGE which MUST be uppercase.
 12. A `!` MAY be appended prior to the `:` in the type/scope prefix, to further draw attention to breaking changes. `BREAKING CHANGE: description` MUST also be included in the body
 or footer, along with the `!` in the prefix.
-
-## Why Use Conventional Commits
-
-* Automatically generating CHANGELOGs.
-* Automatically determining a semantic version bump (based on the types of commits landed).
-* Communicating the nature of changes to teammates, the public, and other stakeholders.
-* Triggering build and publish processes.
-* Making it easier for people to contribute to your projects, by allowing them to explore
-  a more structured commit history.
