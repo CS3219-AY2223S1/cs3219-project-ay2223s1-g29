@@ -38,7 +38,7 @@ export default function ChatBox(props: ChatBoxProps) {
     navigator.mediaDevices
       .getUserMedia({
         video: true,
-        audio: false,
+        audio: true,
       })
       .then((stream) => {
         setUserMedia(stream);
