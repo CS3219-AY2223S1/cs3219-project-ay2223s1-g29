@@ -34,6 +34,12 @@ export default function Editor(props: EditorProps) {
     // @ts-ignore
     const provider = new WebrtcProvider(`cs3219-g29-2022-${roomId}`, ydoc, {
       password: roomId,
+      signaling: [
+        'wss://signaling.yjs.dev',
+        'wss://cs3219-yjs-service-dot-cs3219-362509.et.r.appspot.com',
+        'wss://y-webrtc-signaling-eu.herokuapp.com',
+        'wss://y-webrtc-signaling-us.herokuapp.com',
+      ],
     });
     const type = ydoc.getText('monaco');
 
@@ -48,15 +54,9 @@ export default function Editor(props: EditorProps) {
       return;
     }
 
-    const monacoBinding = new MonacoBinding(
-      type,
-      editorModel,
-      new Set([editor]),
-      provider.awareness,
-    );
+    const monacoBinding = new MonacoBinding(type, editorModel);
 
     return () => {
-      monacoBinding.destroy();
       editor.dispose();
       provider.destroy();
       ydoc.destroy();
