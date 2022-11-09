@@ -43,6 +43,7 @@ export default function ChatBox(props: ChatBoxProps) {
       .then((stream) => {
         setUserMedia(stream);
         userVid.current!.srcObject = stream;
+        userVid.current!.muted = true;
       })
       .catch((err) => {
         alert(
